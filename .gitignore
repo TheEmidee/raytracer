@@ -1,0 +1,8 @@
+Win32Project1/.vs/
+Win32Project/Debug/
+Win32Project/Release/
+Win32Project1/Debug/
+*.sdf
+*.opendb
+Win32Project1/Win32Project1/Debug/
+Win32Project1/ipch/
