@@ -31,7 +31,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    backBuffer = std::make_unique< Backbuffer >( 1280, 720 );
+    backBuffer = std::make_unique< Backbuffer >( 640, 480 );
     rayTracer = std::make_unique< RayTracer >();
 
     // Initialize global strings
