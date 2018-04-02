@@ -1,5 +1,6 @@
 #include "raytracer.h"
 #include "backbuffer.h"
+#include "vec3.h"
 
 void RayTracer::Process( Backbuffer & back_buffer )
 {
@@ -9,9 +10,14 @@ void RayTracer::Process( Backbuffer & back_buffer )
         
         for ( int x = 0; x < back_buffer.GetWidth(); x++ )
         {
-            data[ 0 ] = static_cast< float >( x ) / static_cast< float >( back_buffer.GetWidth() );
-            data[ 1 ] = static_cast< float >( y ) / static_cast< float >( back_buffer.GetHeight() );
-            data[ 2 ] = 0.2f;
+            Vec3 color;
+            color.x = static_cast< float >( x ) / static_cast< float >( back_buffer.GetWidth() );
+            color.y = static_cast< float >( y ) / static_cast< float >( back_buffer.GetHeight() );
+            color.z = 0.2f;
+
+            data[ 0 ] = color.x;
+            data[ 1 ] = color.y;
+            data[ 2 ] = color.z;
             data += 4;
         }
     }
