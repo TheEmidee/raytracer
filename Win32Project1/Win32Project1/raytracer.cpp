@@ -11,6 +11,7 @@
 #include "camera.h"
 #include "hitinfos.h"
 #include "maths.h"
+#include "material.h"
 
 void RayTracer::Process( Backbuffer & back_buffer, const World & world, const Camera & camera )
 {
@@ -31,7 +32,7 @@ void RayTracer::Process( Backbuffer & back_buffer, const World & world, const Ca
 
                 Ray ray = camera.GetRay( u, v );
 
-                color += Color( ray, world, state );
+                color += Color( ray, world, state, 0 );
             }
             
             color /= static_cast< float >( camera.GetRaysPerPixel() );
@@ -46,14 +47,27 @@ void RayTracer::Process( Backbuffer & back_buffer, const World & world, const Ca
     }
 }
 
-Vec3 RayTracer::Color( const Ray & ray, const World & world, uint32_t & state ) const
+Vec3 RayTracer::Color( const Ray & ray, const World & world, uint32_t & state, int depth ) const
 {
     HitInfos hit_infos;
 
     if ( world.Hit( ray, 0.0001f, std::numeric_limits< float >::max(), hit_infos ) )
     {
-        auto target = hit_infos.Point + hit_infos.Normal + RandomInUnitSphere( state );
-        return 0.5f * Color( Ray( hit_infos.Point, Normalize( target - hit_infos.Point ) ), world, state );
+        Ray scattered;
+        Vec3 attenuation;
+
+        if ( depth < 50 )
+        {
+            if ( auto material_shared_ptr = hit_infos.Material.lock() )
+            {
+                if ( material_shared_ptr->Scatter( ray, hit_infos, attenuation, scattered, state ) )
+                {
+                    return attenuation * Color( scattered, world, state, depth + 1 );
+                }
+            }
+        }
+        
+        return Vec3( 0.0f, 0.0f, 0.0f );
     }
 
     auto direction = Normalize( ray.direction );

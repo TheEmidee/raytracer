@@ -47,3 +47,8 @@ inline Vec3 Normalize( const Vec3 & v )
     float k = 1.0f / v.Length(); 
     return Vec3( v.x*k, v.y*k, v.z*k ); 
 }
+
+inline Vec3 Reflect( const Vec3 & vector, const Vec3 & normal )
+{
+    return vector - 2 * Vec3::Dot( vector, normal ) * normal;
+}

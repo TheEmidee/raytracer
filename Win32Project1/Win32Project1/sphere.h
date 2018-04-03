@@ -11,8 +11,7 @@ class Sphere : public Hitable
 {
 public:
 
-    Sphere();
-    Sphere( const Vec3 & center_, float radius_ );
+    Sphere( const Vec3 & center_, float radius_, std::shared_ptr< const Material > material_ );
 
     virtual bool Hit( const Ray & ray, float min_time, float max_time, HitInfos & hit_infos ) const override;
 

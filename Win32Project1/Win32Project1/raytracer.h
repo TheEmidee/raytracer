@@ -17,5 +17,5 @@ public:
 
 private:
 
-    Vec3 Color( const Ray & ray, const World & world, uint32_t & state ) const;
+    Vec3 Color( const Ray & ray, const World & world, uint32_t & state, int depth ) const;
 };

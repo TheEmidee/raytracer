@@ -2,14 +2,8 @@
 #include "ray.h"
 #include "hitinfos.h"
 
-Sphere::Sphere()
-    : center(), radius( 0.0f )
-{
-
-}
-
-Sphere::Sphere( const Vec3 & center_, float radius_ )
-    : center( center_ ), radius( radius_ )
+Sphere::Sphere( const Vec3 & center_, float radius_, std::shared_ptr< const Material > material_ )
+    : Hitable( material_ ), center( center_ ), radius( radius_ )
 {
 
 }
@@ -51,4 +45,5 @@ void Sphere::FillHitInfos( HitInfos & hit_infos, const Ray & ray, float time ) c
     hit_infos.Time = time;
     hit_infos.Point = ray.PointAt( time );
     hit_infos.Normal = ( hit_infos.Point - center ) / radius;
+    hit_infos.Material = material;
 }
