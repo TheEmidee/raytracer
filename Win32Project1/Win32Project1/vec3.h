@@ -38,6 +38,7 @@ inline Vec3 operator-( const Vec3& a, const Vec3& b ) { return Vec3( a.x - b.x, 
 inline Vec3 operator*( const Vec3& a, const Vec3& b ) { return Vec3( a.x*b.x, a.y*b.y, a.z*b.z ); }
 inline Vec3 operator*( const Vec3& a, float b ) { return Vec3( a.x*b, a.y*b, a.z*b ); }
 inline Vec3 operator*( float a, const Vec3& b ) { return Vec3( a*b.x, a*b.y, a*b.z ); }
+inline Vec3 operator/( const Vec3& b, float a ) { return Vec3( b.x / a, b.y / a, b.z / a ); }
 inline Vec3 operator+( float a, const Vec3& b ) { return Vec3( a + b.x, a + b.y, a + b.z ); }
 inline Vec3 operator+( const Vec3& b, float a ) { return Vec3( a + b.x, a + b.y, a + b.z ); }
 

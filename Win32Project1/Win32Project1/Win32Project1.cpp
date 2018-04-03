@@ -6,6 +6,10 @@
 
 #include "backbuffer.h"
 #include "raytracer.h"
+#include "world.h"
+#include "sphere.h"
+#include "vec3.h"
+#include "camera.h"
 
 #define MAX_LOADSTRING 100
 
@@ -22,6 +26,8 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 std::unique_ptr< Backbuffer > backBuffer;
 std::unique_ptr< RayTracer > rayTracer;
+std::unique_ptr< World > world;
+std::unique_ptr< Camera > camera;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -31,8 +37,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    backBuffer = std::make_unique< Backbuffer >( 640, 480 );
+    backBuffer = std::make_unique< Backbuffer >( 200, 100 );
+
+    std::vector< std::shared_ptr< Hitable > > hitables = 
+    {
+        std::make_shared< Sphere >( Vec3( 0.0f, 0.0f, -1.0f ), 0.5f ),
+        std::make_shared< Sphere >( Vec3( 0.0f, -100.5f, -1.0f ), 100.0f )
+    };
+
+    world = std::make_unique< World >( hitables );
     rayTracer = std::make_unique< RayTracer >();
+    camera = std::make_unique< Camera >( 100 );
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -148,7 +163,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_PAINT:
         {
-            rayTracer->Process( *backBuffer.get() );
+            rayTracer->Process( *backBuffer.get(), *world.get(), *camera.get() );
 
             PAINTSTRUCT ps;
             RECT rect;

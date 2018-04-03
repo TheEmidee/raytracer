@@ -96,7 +96,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -146,18 +146,27 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backbuffer.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="helpers.h" />
+    <ClInclude Include="hitable.h" />
+    <ClInclude Include="hitinfos.h" />
+    <ClInclude Include="maths.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="raytracer.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="sphere.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="vec3.h" />
     <ClInclude Include="Win32Project1.h" />
+    <ClInclude Include="world.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="backbuffer.cpp" />
+    <ClCompile Include="camera.cpp" />
+    <ClCompile Include="maths.cpp" />
     <ClCompile Include="raytracer.cpp" />
+    <ClCompile Include="sphere.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -165,6 +174,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Win32Project1.cpp" />
+    <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Win32Project1.rc" />
