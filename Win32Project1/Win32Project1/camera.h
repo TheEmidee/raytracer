@@ -1,18 +1,19 @@
 #pragma once
 
+#include <stdint.h>
 #include "ray.h"
 
 class Camera
 {
 public:
 
-    Camera( const Vec3 & look_from, const Vec3 & look_at, const Vec3 & up, float vfov, float aspect, int rays_per_pixel );
+    Camera( const Vec3 & look_from, const Vec3 & look_at, const Vec3 & up, float vfov, float aspect, float aperture, float focus_distance );
 
-    Ray GetRay( float u, float v ) const;
-    inline int GetRaysPerPixel() const { return raysPerPixel; }
+    Ray GetRay( float u, float v, uint32_t& state ) const;
 
 private:
 
-    Vec3 origin, lower_left_corner, horizontal, vertical;
-    int raysPerPixel;
+    Vec3 origin, lowerLeftCorner, horizontal, vertical;
+    Vec3 u, v, w;
+    float lensRadius;
 };

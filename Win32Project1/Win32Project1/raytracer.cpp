@@ -24,17 +24,17 @@ void RayTracer::Process( Backbuffer & back_buffer, int & ray_count, const World 
         {
             Vec3 color( 0.0f, 0.0f, 0.0f );
 
-            for ( int sample = 0; sample < camera.GetRaysPerPixel(); sample++ )
+            for ( int sample = 0; sample < samplePerPixel; sample++ )
             {
                 const auto u = static_cast< float >( x + RandomFloat01( state ) ) / static_cast< float >( back_buffer.GetWidth() );
                 const auto v = static_cast< float >( y + RandomFloat01( state ) ) / static_cast< float >( back_buffer.GetHeight() );
 
-                Ray ray = camera.GetRay( u, v );
+                Ray ray = camera.GetRay( u, v, state );
 
                 color += Trace( ray_count, ray, world, state, 0 );
             }
             
-            color /= static_cast< float >( camera.GetRaysPerPixel() );
+            color /= static_cast< float >( samplePerPixel );
             color = Vec3( sqrtf( color.x ), sqrtf( color.y ), sqrtf( color.z ) );
 
             float * data = back_buffer.GetData() + y * back_buffer.GetWidth() * 4 + x * 4;

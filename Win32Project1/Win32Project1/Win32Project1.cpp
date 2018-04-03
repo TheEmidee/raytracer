@@ -42,7 +42,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    backBuffer = std::make_unique< Backbuffer >( 200, 100 );
+    backBuffer = std::make_unique< Backbuffer >( 400, 300 );
 
     const auto r = cosf( kPI / 4.0f );
 
@@ -51,15 +51,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         std::make_shared< Sphere >( Vec3( 0.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialLambert >( Vec3( 0.1f, 0.2f, 0.5f ) ) ),
         std::make_shared< Sphere >( Vec3( 0.0f, -100.5f, -1.0f ), 100.0f, std::make_shared< MaterialLambert >( Vec3( 0.8f, 0.8f, 0.0f ) ) ),
         std::make_shared< Sphere >( Vec3( 1.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialMetal>( Vec3( 0.8f, 0.6f, 0.2f ), 1.0f ) ),
-        std::make_shared< Sphere >( Vec3( -1.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialDiElectric >( 1.5f ) ),
-        std::make_shared< Sphere >( Vec3( -1.0f, 0.0f, -1.0f ), -0.45f, std::make_shared< MaterialDiElectric >( 1.5f ) )
+        std::make_shared< Sphere >( Vec3( -1.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialDiElectric >( 1.5f ) )
     };
 
     world = std::make_unique< World >( hitables );
-    rayTracer = std::make_unique< RayTracer >();
+    rayTracer = std::make_unique< RayTracer >( 50 );
 
     const auto aspect_ratio = static_cast< float >( backBuffer->GetWidth() ) / static_cast< float >( backBuffer->GetHeight() );
-    camera = std::make_unique< Camera >( Vec3( 0.0f, 0.0f, 0.3f ), Vec3( 0.0f, 0.0f, -1.0f ), Vec3( 0.0f, 1.0f, 0.0f ), 60.0f, aspect_ratio, 100 );
+
+    static const Vec3 look_from( 0.0f, 0.0f, 0.3f ),
+        look_at( 0.0f, 0.0f, -1.0f );
+
+    camera = std::make_unique< Camera >( look_from, look_at, Vec3( 0.0f, 1.0f, 0.0f ), 60.0f, aspect_ratio, 0.01f, ( look_at - look_from ).Length() );
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);

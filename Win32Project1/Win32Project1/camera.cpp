@@ -2,10 +2,9 @@
 #include "vec3.h"
 #include "maths.h"
 
-Camera::Camera( const Vec3 & look_from, const Vec3 & look_at, const Vec3 & up, float vfov, float aspect, int rays_per_pixel )
-    : raysPerPixel( rays_per_pixel )
+Camera::Camera( const Vec3 & look_from, const Vec3 & look_at, const Vec3 & up, float vfov, float aspect, float aperture, float focus_distance )
 {
-    Vec3 u, v, w;
+    lensRadius = aperture / 2.0f;
 
     float theta = vfov * kPI / 180.0f;
     float half_height = tanf( theta / 2.0f );
@@ -16,12 +15,15 @@ Camera::Camera( const Vec3 & look_from, const Vec3 & look_at, const Vec3 & up, f
     u = Normalize( Vec3::Cross( up, w ) );
     v = Vec3::Cross( w, u );
 
-    lower_left_corner = origin - half_width * u - half_height * v - w;
-    horizontal = 2.0f * half_width * u;
-    vertical = 2.0f * half_height * v;
+    lowerLeftCorner = origin - half_width * focus_distance * u - half_height * focus_distance * v - focus_distance * w;
+    horizontal = 2.0f * half_width * focus_distance * u;
+    vertical = 2.0f * half_height * focus_distance * v;
 }
 
-Ray Camera::GetRay( float u, float v ) const
+Ray Camera::GetRay( float s, float t, uint32_t & state ) const
 {
-    return Ray( origin, Normalize( lower_left_corner + u * horizontal + v * vertical ) );
+    Vec3 rd = lensRadius * RandomInUnitDisk( state );
+    Vec3 offset = u * rd.x + v * rd.y;
+
+    return Ray( origin + offset, Normalize( lowerLeftCorner + s * horizontal + t * vertical - origin - offset ) );
 }
