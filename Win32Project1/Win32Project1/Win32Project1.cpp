@@ -41,10 +41,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     std::vector< std::shared_ptr< Hitable > > hitables = 
     {
-        std::make_shared< Sphere >( Vec3( 0.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialLambert >( Vec3( 0.8f, 0.3f, 0.3f ) ) ),
+        std::make_shared< Sphere >( Vec3( 0.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialLambert >( Vec3( 0.1f, 0.2f, 0.5f ) ) ),
         std::make_shared< Sphere >( Vec3( 0.0f, -100.5f, -1.0f ), 100.0f, std::make_shared< MaterialLambert >( Vec3( 0.8f, 0.8f, 0.0f ) ) ),
-        std::make_shared< Sphere >( Vec3( 1.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialMetal>( Vec3( 0.8f, 0.6f, 0.2f ) ) ),
-        std::make_shared< Sphere >( Vec3( -1.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialMetal >( Vec3( 0.8f, 0.8f, 0.8f ) ) )
+        std::make_shared< Sphere >( Vec3( 1.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialMetal>( Vec3( 0.8f, 0.6f, 0.2f ), 1.0f ) ),
+        std::make_shared< Sphere >( Vec3( -1.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialDiElectric >( 1.5f ) ),
+        std::make_shared< Sphere >( Vec3( -1.0f, 0.0f, -1.0f ), -0.45f, std::make_shared< MaterialDiElectric >( 1.5f ) )
     };
 
     world = std::make_unique< World >( hitables );

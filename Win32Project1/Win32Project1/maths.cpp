@@ -44,3 +44,11 @@ Vec3 RandomUnitVector( uint32_t& state )
     float y = r * sinf( a );
     return Vec3( x, y, z );
 }
+
+float Schlick( float cosine, float refraction_index )
+{
+    float r0 = ( 1.0f - refraction_index ) / ( 1.0f + refraction_index );
+    r0 = r0 * r0;
+
+    return r0 + ( 1.0f - r0 ) * powf( 1 - cosine, 0.5f );
+}

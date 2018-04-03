@@ -12,3 +12,5 @@ float RandomFloat01( uint32_t & state );
 Vec3 RandomInUnitDisk( uint32_t & state );
 Vec3 RandomInUnitSphere( uint32_t & state );
 Vec3 RandomUnitVector( uint32_t & state );
+
+float Schlick( float cosine, float refraction_index );

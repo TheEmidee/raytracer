@@ -14,7 +14,7 @@ bool World::Hit( const Ray & ray, float min_time, float max_time, HitInfos & hit
 {
     HitInfos temp_hit_infos;
     bool hit_anything = false;
-    double closest_so_far = max_time;
+    float closest_so_far = max_time;
 
     for ( const auto & hitable : hitables )
     {

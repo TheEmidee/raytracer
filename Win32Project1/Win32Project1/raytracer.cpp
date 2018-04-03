@@ -36,7 +36,7 @@ void RayTracer::Process( Backbuffer & back_buffer, const World & world, const Ca
             }
             
             color /= static_cast< float >( camera.GetRaysPerPixel() );
-            color = Vec3( sqrt( color.x ), sqrt( color.y ), sqrt( color.z ) );
+            color = Vec3( sqrtf( color.x ), sqrtf( color.y ), sqrtf( color.z ) );
 
             data[ 0 ] = color.x;
             data[ 1 ] = color.y;

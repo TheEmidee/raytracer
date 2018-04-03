@@ -18,7 +18,7 @@ bool Sphere::Hit( const Ray & ray, float min_time, float max_time, HitInfos & hi
 
     if ( discriminant > 0 )
     {
-        float squared_discriminant = sqrt( discriminant );
+        float squared_discriminant = sqrtf( discriminant );
 
         float time = -b - squared_discriminant;
 
