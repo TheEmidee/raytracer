@@ -1,13 +1,24 @@
 #include "camera.h"
 #include "vec3.h"
+#include "maths.h"
 
-Camera::Camera( int rays_per_pixel )
+Camera::Camera( const Vec3 & look_from, const Vec3 & look_at, const Vec3 & up, float vfov, float aspect, int rays_per_pixel )
     : raysPerPixel( rays_per_pixel )
-    , origin( Vec3( 0.0f, 0.0f, 0.0f ) )
-    , lower_left_corner( Vec3( -2.0f, -1.0f, -1.0f ) )
-    , horizontal( Vec3( 4.0f, 0.0f, 0.0f ) )
-    , vertical( Vec3( 0.0, 2.0f, 0.0f ) )
 {
+    Vec3 u, v, w;
+
+    float theta = vfov * kPI / 180.0f;
+    float half_height = tanf( theta / 2.0f );
+    float half_width = aspect * half_height;
+
+    origin = look_from;
+    w = Normalize( look_from - look_at );
+    u = Normalize( Vec3::Cross( up, w ) );
+    v = Vec3::Cross( w, u );
+
+    lower_left_corner = origin - half_width * u - half_height * v - w;
+    horizontal = 2.0f * half_width * u;
+    vertical = 2.0f * half_height * v;
 }
 
 Ray Camera::GetRay( float u, float v ) const

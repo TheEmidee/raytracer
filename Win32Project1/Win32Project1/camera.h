@@ -6,7 +6,7 @@ class Camera
 {
 public:
 
-    Camera( int rays_per_pixel );
+    Camera( const Vec3 & look_from, const Vec3 & look_at, const Vec3 & up, float vfov, float aspect, int rays_per_pixel );
 
     Ray GetRay( float u, float v ) const;
     inline int GetRaysPerPixel() const { return raysPerPixel; }

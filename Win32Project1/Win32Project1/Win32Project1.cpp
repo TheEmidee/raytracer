@@ -7,6 +7,7 @@
 #include "backbuffer.h"
 #include "raytracer.h"
 #include "world.h"
+#include "maths.h"
 #include "sphere.h"
 #include "vec3.h"
 #include "camera.h"
@@ -43,6 +44,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     backBuffer = std::make_unique< Backbuffer >( 200, 100 );
 
+    const auto r = cosf( kPI / 4.0f );
+
     std::vector< std::shared_ptr< Hitable > > hitables = 
     {
         std::make_shared< Sphere >( Vec3( 0.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialLambert >( Vec3( 0.1f, 0.2f, 0.5f ) ) ),
@@ -54,7 +57,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     world = std::make_unique< World >( hitables );
     rayTracer = std::make_unique< RayTracer >();
-    camera = std::make_unique< Camera >( 100 );
+
+    const auto aspect_ratio = static_cast< float >( backBuffer->GetWidth() ) / static_cast< float >( backBuffer->GetHeight() );
+    camera = std::make_unique< Camera >( Vec3( 0.0f, 0.0f, 0.3f ), Vec3( 0.0f, 0.0f, -1.0f ), Vec3( 0.0f, 1.0f, 0.0f ), 60.0f, aspect_ratio, 100 );
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
