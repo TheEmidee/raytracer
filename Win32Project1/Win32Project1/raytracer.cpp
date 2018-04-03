@@ -38,7 +38,6 @@ void RayTracer::Process( Backbuffer & back_buffer, int & ray_count, const int fr
             }
             
             color /= static_cast< float >( samplePerPixel );
-            //color = Vec3( sqrtf( color.x ), sqrtf( color.y ), sqrtf( color.z ) );
 
             Vec3 prev( data[ 0 ], data[ 1 ], data[ 2 ] );
             color = prev * lerpFac + color * ( 1 - lerpFac );

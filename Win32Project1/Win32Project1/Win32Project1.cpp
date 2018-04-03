@@ -58,49 +58,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    backBuffer = std::make_unique< Backbuffer >( 200, 100 );
+    backBuffer = std::make_unique< Backbuffer >( 1280, 720 );
 
     const auto r = cosf( kPI / 4.0f );
 
     std::vector< std::shared_ptr< Hitable > > hitables = 
     {
-        std::make_shared< Sphere >( Vec3( 0.0f, -1000.0f, 0.0f ), 1000.0f, std::make_shared< MaterialLambert >( Vec3( 0.5f, 0.5f, 0.5f ) ) ),
-        std::make_shared< Sphere >( Vec3( 0.0f, 1.0f, 0.0f ), 1.0f, std::make_shared< MaterialDiElectric >( 1.5f ) ),
-        std::make_shared< Sphere >( Vec3( -4.0f, 1.0f, 0.0f ), 1.0f, std::make_shared< MaterialLambert >( Vec3( 0.4f, 0.2f, 0.1f ) ) ),
-        std::make_shared< Sphere >( Vec3( 4.0f, 1.0f, 0.0f ), 1.0f, std::make_shared< MaterialMetal>( Vec3( 0.7f, 0.6f, 0.5f ), 0.0f ) )
+        std::make_shared< Sphere >( Vec3( 0.0f, -100.5f, -1.0f ), 100.0f, std::make_shared< MaterialLambert >( Vec3( 0.8f, 0.8f, 0.8f ) ) ),
+        std::make_shared< Sphere >( Vec3( 2.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialLambert >( Vec3( 0.8f, 0.4f, 0.4f ) ) ),
+        std::make_shared< Sphere >( Vec3( 0.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialLambert >( Vec3( 0.4f, 0.8f, 0.4f ) ) ),
+        std::make_shared< Sphere >( Vec3( -2.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialMetal >( Vec3( 0.4f, 0.4f, 0.8f ), 0.0f ) ),
+        std::make_shared< Sphere >( Vec3( 2.0f, 0.0f, 1.0f ), 0.5f, std::make_shared< MaterialMetal >( Vec3( 0.4f, 0.8f, 0.4f ), 0.0f ) ),
+        std::make_shared< Sphere >( Vec3( 0.0f, 0.0f, 1.0f ), 0.5f, std::make_shared< MaterialMetal >( Vec3( 0.4f, 0.8f, 0.4f ), 0.2f ) ),
+        std::make_shared< Sphere >( Vec3( -2.0f, 0.0f, 1.0f ), 0.5f, std::make_shared< MaterialMetal >( Vec3( 0.4f, 0.8f, 0.4f ), 0.6f ) ),
+        std::make_shared< Sphere >( Vec3( 0.5f, 1.0f, 0.5f ), 0.5f, std::make_shared< MaterialDiElectric >( 1.5f ) ),
+        std::make_shared< Sphere >( Vec3( -1.5f, 1.5f, 0.0f ), 0.3f, std::make_shared< MaterialLambert >( Vec3( 0.8f, 0.6f, 0.2f ) ) ),
     };
-
-    int n = 50000;
-
-    int i = 1;
-
-    uint32_t state = 1337;
-
-    for ( auto a = -10; a < 10; a++ )
-    {
-        for ( auto b = -10; b < 10; b++ )
-        {
-            Vec3 center( a + 0.9 * RandomFloat01( state ), 0.2f, b + RandomFloat01( state ) );
-
-            if ( ( center - Vec3( 4, 0.2, 0 ) ).Length() > 0.9f )
-            {
-                hitables.push_back( 
-                    std::make_shared< Sphere >( 
-                        center, 
-                        0.2f, 
-                        std::make_shared< MaterialMetal >( 
-                            Vec3( 
-                                0.5f * ( 1 + RandomFloat01( state ) ),
-                                0.5f * ( 1 + RandomFloat01( state ) ),
-                                0.5f * ( 1 + RandomFloat01( state ) )
-                                ),
-                            0.5f * RandomFloat01( state )
-                            ) 
-                        )
-                    );
-            }
-        }
-    }
 
     world = std::make_unique< World >( hitables );
     rayTracer = std::make_unique< RayTracer >( 4, 10 );
@@ -108,12 +81,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     const auto aspect_ratio = static_cast< float >( backBuffer->GetWidth() ) / static_cast< float >( backBuffer->GetHeight() );
 
     static const Vec3 
-        look_from( 13.0f, 2.0f, 3.0f ),
+        look_from( 0.0f, 2.0f, 3.0f ),
         look_at( 0.0f, 0.0f, 0.0f );
     static const auto
-        fov = 20.0f,
-        aperture = 0.0f,
-        focus_distance = 10.0f;
+        fov = 60.0f,
+        aperture = 0.1f,
+        focus_distance = 3.0f;
 
     camera = std::make_unique< Camera >( look_from, look_at, Vec3( 0.0f, 1.0f, 0.0f ), fov, aspect_ratio, aperture, focus_distance );
 
@@ -268,7 +241,7 @@ static void RenderFrame()
     QueryPerformanceFrequency( &frequency );
 
     double s = double( dt ) / double( frequency.QuadPart );
-    sprintf_s( s_Buffer, sizeof( s_Buffer ), "%.2fms (%.1f FPS) %.2fMrays/s frames %i \n", s * 1000.0f, 1.f / s, ray_count / s * 1.0e-6f, s_FrameCount );
+    sprintf_s( s_Buffer, sizeof( s_Buffer ), "%.2fms (%.1f FPS) %.2fMrays/s frame #%i \n", s * 1000.0f, 1.f / s, ray_count / s * 1.0e-6f, s_FrameCount );
     SetWindowTextA( g_Wnd, s_Buffer );
     OutputDebugStringA( s_Buffer );
 
