@@ -18,7 +18,7 @@ public:
         : samplePerPixel( sample_per_pixel ), maxTraceDepth( max_trace_depth )
     {}
 
-    void Process( Backbuffer & back_buffer, int & ray_count, const World & world, const Camera & camera );
+    void Process( Backbuffer & back_buffer, int & ray_count, const int frame_count, const World & world, const Camera & camera );
 
 private:
 

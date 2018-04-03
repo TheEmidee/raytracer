@@ -13,13 +13,16 @@
 #include "maths.h"
 #include "material.h"
 
-thread_local static uint32_t state = 1337;
-
-void RayTracer::Process( Backbuffer & back_buffer, int & ray_count, const World & world, const Camera & camera )
+void RayTracer::Process( Backbuffer & back_buffer, int & ray_count, const int frame_count, const World & world, const Camera & camera )
 {
+    float lerpFac = float( frame_count ) / float( frame_count + 1 );
+
 #pragma omp parallel for schedule( dynamic )
     for ( int y = 0; y < back_buffer.GetHeight(); y++ )
     {
+        float * data = back_buffer.GetData() + y * back_buffer.GetWidth() * 4;
+        uint32_t state = ( y * 9781 + frame_count * 6271 ) | 1;
+        
         for ( int x = 0; x < back_buffer.GetWidth(); x++ )
         {
             Vec3 color( 0.0f, 0.0f, 0.0f );
@@ -35,13 +38,15 @@ void RayTracer::Process( Backbuffer & back_buffer, int & ray_count, const World 
             }
             
             color /= static_cast< float >( samplePerPixel );
-            color = Vec3( sqrtf( color.x ), sqrtf( color.y ), sqrtf( color.z ) );
+            //color = Vec3( sqrtf( color.x ), sqrtf( color.y ), sqrtf( color.z ) );
 
-            float * data = back_buffer.GetData() + y * back_buffer.GetWidth() * 4 + x * 4;
+            Vec3 prev( data[ 0 ], data[ 1 ], data[ 2 ] );
+            color = prev * lerpFac + color * ( 1 - lerpFac );
 
             data[ 0 ] = color.x;
             data[ 1 ] = color.y;
             data[ 2 ] = color.z;
+            data += 4;
         }
     }
 }

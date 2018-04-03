@@ -249,12 +249,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 static void RenderFrame()
 {
+    static int s_FrameCount = 0;
+
     LARGE_INTEGER time1;
     QueryPerformanceCounter( &time1 );
 
     int ray_count = 0;
 
-    rayTracer->Process( *backBuffer.get(), ray_count, *world.get(), *camera.get() );
+    rayTracer->Process( *backBuffer.get(), ray_count, s_FrameCount, *world.get(), *camera.get() );
+
+    s_FrameCount++;
 
     LARGE_INTEGER time2;
     QueryPerformanceCounter( &time2 );
@@ -264,7 +268,7 @@ static void RenderFrame()
     QueryPerformanceFrequency( &frequency );
 
     double s = double( dt ) / double( frequency.QuadPart );
-    sprintf_s( s_Buffer, sizeof( s_Buffer ), "%.2fms (%.1f FPS) %.2fMrays/s \n", s * 1000.0f, 1.f / s, ray_count / s * 1.0e-6f );
+    sprintf_s( s_Buffer, sizeof( s_Buffer ), "%.2fms (%.1f FPS) %.2fMrays/s frames %i \n", s * 1000.0f, 1.f / s, ray_count / s * 1.0e-6f, s_FrameCount );
     SetWindowTextA( g_Wnd, s_Buffer );
     OutputDebugStringA( s_Buffer );
 
