@@ -42,27 +42,64 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    backBuffer = std::make_unique< Backbuffer >( 400, 300 );
+    backBuffer = std::make_unique< Backbuffer >( 200, 100 );
 
     const auto r = cosf( kPI / 4.0f );
 
     std::vector< std::shared_ptr< Hitable > > hitables = 
     {
-        std::make_shared< Sphere >( Vec3( 0.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialLambert >( Vec3( 0.1f, 0.2f, 0.5f ) ) ),
-        std::make_shared< Sphere >( Vec3( 0.0f, -100.5f, -1.0f ), 100.0f, std::make_shared< MaterialLambert >( Vec3( 0.8f, 0.8f, 0.0f ) ) ),
-        std::make_shared< Sphere >( Vec3( 1.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialMetal>( Vec3( 0.8f, 0.6f, 0.2f ), 1.0f ) ),
-        std::make_shared< Sphere >( Vec3( -1.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialDiElectric >( 1.5f ) )
+        std::make_shared< Sphere >( Vec3( 0.0f, -1000.0f, 0.0f ), 1000.0f, std::make_shared< MaterialLambert >( Vec3( 0.5f, 0.5f, 0.5f ) ) ),
+        std::make_shared< Sphere >( Vec3( 0.0f, 1.0f, 0.0f ), 1.0f, std::make_shared< MaterialDiElectric >( 1.5f ) ),
+        std::make_shared< Sphere >( Vec3( -4.0f, 1.0f, 0.0f ), 1.0f, std::make_shared< MaterialLambert >( Vec3( 0.4f, 0.2f, 0.1f ) ) ),
+        std::make_shared< Sphere >( Vec3( 4.0f, 1.0f, 0.0f ), 1.0f, std::make_shared< MaterialMetal>( Vec3( 0.7f, 0.6f, 0.5f ), 0.0f ) )
     };
 
+    int n = 50000;
+
+    int i = 1;
+
+    uint32_t state = 1337;
+
+    for ( auto a = -10; a < 10; a++ )
+    {
+        for ( auto b = -10; b < 10; b++ )
+        {
+            Vec3 center( a + 0.9 * RandomFloat01( state ), 0.2f, b + RandomFloat01( state ) );
+
+            if ( ( center - Vec3( 4, 0.2, 0 ) ).Length() > 0.9f )
+            {
+                hitables.push_back( 
+                    std::make_shared< Sphere >( 
+                        center, 
+                        0.2f, 
+                        std::make_shared< MaterialMetal >( 
+                            Vec3( 
+                                0.5f * ( 1 + RandomFloat01( state ) ),
+                                0.5f * ( 1 + RandomFloat01( state ) ),
+                                0.5f * ( 1 + RandomFloat01( state ) )
+                                ),
+                            0.5f * RandomFloat01( state )
+                            ) 
+                        )
+                    );
+            }
+        }
+    }
+
     world = std::make_unique< World >( hitables );
-    rayTracer = std::make_unique< RayTracer >( 50 );
+    rayTracer = std::make_unique< RayTracer >( 4, 10 );
 
     const auto aspect_ratio = static_cast< float >( backBuffer->GetWidth() ) / static_cast< float >( backBuffer->GetHeight() );
 
-    static const Vec3 look_from( 0.0f, 0.0f, 0.3f ),
-        look_at( 0.0f, 0.0f, -1.0f );
+    static const Vec3 
+        look_from( 13.0f, 2.0f, 3.0f ),
+        look_at( 0.0f, 0.0f, 0.0f );
+    static const auto
+        fov = 20.0f,
+        aperture = 0.0f,
+        focus_distance = 10.0f;
 
-    camera = std::make_unique< Camera >( look_from, look_at, Vec3( 0.0f, 1.0f, 0.0f ), 60.0f, aspect_ratio, 0.01f, ( look_at - look_from ).Length() );
+    camera = std::make_unique< Camera >( look_from, look_at, Vec3( 0.0f, 1.0f, 0.0f ), fov, aspect_ratio, aperture, focus_distance );
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -77,15 +114,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WIN32PROJECT1));
 
-    MSG msg;
+    MSG msg = { 0 };
 
     // Main message loop:
-    while (GetMessage(&msg, nullptr, 0, 0))
+    /*while (GetMessage(&msg, nullptr, 0, 0))
     {
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+        }
+    }*/
+
+    while ( msg.message != WM_QUIT )
+    {
+        if ( PeekMessage( &msg, NULL, 0U, 0U, PM_REMOVE ) )
+        {
+            TranslateMessage( &msg );
+            DispatchMessage( &msg );
+        }
+        else
+        {
+            //RenderFrame();
         }
     }
 
@@ -202,7 +252,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             QueryPerformanceFrequency( &frequency );
 
             double s = double( dt ) / double( frequency.QuadPart );
-            sprintf_s( s_Buffer, sizeof( s_Buffer ), "%.2fms (%.1f FPS) %.1fMrays/s \n", s * 1000.0f, 1.f / s, ray_count / s * 1.0e-6f );
+            sprintf_s( s_Buffer, sizeof( s_Buffer ), "%.2fms (%.1f FPS) %.2fMrays/s \n", s * 1000.0f, 1.f / s, ray_count / s * 1.0e-6f );
             SetWindowTextA( g_Wnd, s_Buffer );
             OutputDebugStringA( s_Buffer );
 

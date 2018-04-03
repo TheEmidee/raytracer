@@ -13,11 +13,11 @@
 #include "maths.h"
 #include "material.h"
 
+thread_local static uint32_t state = 1337;
+
 void RayTracer::Process( Backbuffer & back_buffer, int & ray_count, const World & world, const Camera & camera )
 {
-    uint32_t state = 1337;
-    
-#pragma omp parallel for
+#pragma omp parallel for schedule( dynamic )
     for ( int y = 0; y < back_buffer.GetHeight(); y++ )
     {
         for ( int x = 0; x < back_buffer.GetWidth(); x++ )
@@ -57,7 +57,7 @@ Vec3 RayTracer::Trace( int & ray_count, const Ray & ray, const World & world, ui
         Ray scattered;
         Vec3 attenuation;
 
-        if ( depth < 50 )
+        if ( depth < maxTraceDepth )
         {
             if ( auto material_shared_ptr = hit_infos.Material.lock() )
             {
