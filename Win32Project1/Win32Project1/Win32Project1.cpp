@@ -15,6 +15,8 @@
 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
+static HWND g_Wnd;
+
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
@@ -28,6 +30,8 @@ std::unique_ptr< Backbuffer > backBuffer;
 std::unique_ptr< RayTracer > rayTracer;
 std::unique_ptr< World > world;
 std::unique_ptr< Camera > camera;
+
+static char s_Buffer[ 200 ];
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -130,6 +134,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
+   g_Wnd = hWnd;
+
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
@@ -166,7 +172,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_PAINT:
         {
-            rayTracer->Process( *backBuffer.get(), *world.get(), *camera.get() );
+            LARGE_INTEGER time1;
+            QueryPerformanceCounter( &time1 ); 
+        
+            int ray_count = 0;
+
+            rayTracer->Process( *backBuffer.get(), ray_count, *world.get(), *camera.get() );
+
+            LARGE_INTEGER time2;
+            QueryPerformanceCounter( &time2 );
+            uint64_t dt = time2.QuadPart - time1.QuadPart;
 
             PAINTSTRUCT ps;
             RECT rect;
@@ -174,6 +189,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             GetClientRect( hWnd, &rect );
 
             backBuffer->Draw( hdc, rect.right, rect.bottom );
+
+            LARGE_INTEGER frequency;
+            QueryPerformanceFrequency( &frequency );
+
+            double s = double( dt ) / double( frequency.QuadPart );
+            sprintf_s( s_Buffer, sizeof( s_Buffer ), "%.2fms (%.1f FPS) %.1fMrays/s \n", s * 1000.0f, 1.f / s, ray_count / s * 1.0e-6f );
+            SetWindowTextA( g_Wnd, s_Buffer );
+            OutputDebugStringA( s_Buffer );
 
             RECT textRect;
             textRect.left = 5;
