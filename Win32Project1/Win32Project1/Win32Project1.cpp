@@ -2,6 +2,11 @@
 #include <windows.h>
 #include <memory>
 #include <d3d11_1.h>
+#include <iostream>
+#include <fstream>
+#include <experimental/filesystem>
+#include "atlstr.h"
+#include "json.hpp"
 
 #include "Win32Project1.h"
 
@@ -15,6 +20,8 @@
 
 #include "CompiledVertexShader.h"
 #include "CompiledPixelShader.h"
+
+namespace fs = std::experimental::filesystem;
 
 #define MAX_LOADSTRING 100
 
@@ -58,7 +65,45 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    backBuffer = std::make_unique< Backbuffer >( 1280, 720 );
+    std::string file_name = CW2A(lpCmdLine);
+
+    if (file_name.empty())
+    {
+        return 0;
+    }
+
+    fs::path json_folder = fs::current_path().append("JSON");
+
+    if (!fs::exists(json_folder))
+    {
+        return 0;
+    }
+
+    fs::path path = json_folder / file_name;
+    path.replace_extension(".json");
+
+    if (!fs::exists(path))
+    {
+        return 0;
+    }
+
+    std::ifstream file_stream( path.string() );
+    nlohmann::json json;
+    file_stream >> json;
+
+    try
+    {
+        auto backbuffer_json = json["backbuffer"];
+        auto width = backbuffer_json["width"];
+        auto height = backbuffer_json["height"];
+
+        backBuffer = std::make_unique< Backbuffer >(width, height);
+    }
+    catch ( const std::exception & exception )
+    {
+        std::cerr << exception.what();
+        return 0;
+    }
 
     std::vector< std::shared_ptr< Hitable > > hitables = 
     {
