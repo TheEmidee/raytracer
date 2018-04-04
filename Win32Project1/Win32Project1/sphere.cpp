@@ -3,7 +3,7 @@
 #include "hitinfos.h"
 
 Sphere::Sphere( const Vec3 & center_, float radius_, std::shared_ptr< const Material > material_ )
-    : Hitable( material_ ), center( center_ ), radius( radius_ )
+    : Hitable( material_ ), center( center_ ), radius( radius_ ), squaredRadius( radius_ * radius_ ), invRadius( 1.0f / radius_ )
 {
 
 }
@@ -11,10 +11,9 @@ Sphere::Sphere( const Vec3 & center_, float radius_, std::shared_ptr< const Mate
 bool Sphere::Hit( const Ray & ray, float min_time, float max_time, HitInfos & hit_infos ) const
 {
     Vec3 origin_to_center = ray.origin - center;
-    //float a = Vec3::Dot( ray.direction, ray.direction );
     float b = Vec3::Dot( origin_to_center, ray.direction );
-    float c = Vec3::Dot( origin_to_center, origin_to_center ) - radius * radius;
-    float discriminant = b*b - /*a**/c;
+    float c = Vec3::Dot( origin_to_center, origin_to_center ) - squaredRadius;
+    float discriminant = b*b - c;
 
     if ( discriminant > 0 )
     {
@@ -44,6 +43,6 @@ void Sphere::FillHitInfos( HitInfos & hit_infos, const Ray & ray, float time ) c
 {
     hit_infos.Time = time;
     hit_infos.Point = ray.PointAt( time );
-    hit_infos.Normal = ( hit_infos.Point - center ) / radius;
+    hit_infos.Normal = ( hit_infos.Point - center ) * invRadius;
     hit_infos.Material = material.get();
 }

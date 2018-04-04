@@ -21,4 +21,7 @@ public:
 private:
 
     void FillHitInfos( HitInfos & hit_infos, const Ray & ray, float time ) const;
+
+    float squaredRadius;
+    float invRadius;
 };
