@@ -27,12 +27,9 @@ Vec3 Trace( int & ray_count, const Ray & ray, const World & world, uint32_t & st
 
         if ( depth < max_trace_depth )
         {
-            if ( auto material_shared_ptr = hit_infos.Material.lock() )
+            if ( hit_infos.Material->Scatter( ray, hit_infos, attenuation, scattered, state ) )
             {
-                if ( material_shared_ptr->Scatter( ray, hit_infos, attenuation, scattered, state ) )
-                {
-                    return attenuation * Trace( ray_count, scattered, world, state, depth + 1, max_trace_depth );
-                }
+                return attenuation * Trace( ray_count, scattered, world, state, depth + 1, max_trace_depth );
             }
         }
 

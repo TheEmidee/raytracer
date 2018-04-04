@@ -10,5 +10,5 @@ struct HitInfos
     float Time;
     Vec3 Point;
     Vec3 Normal;
-    std::weak_ptr< Material > Material;
+    const Material * Material;
 };

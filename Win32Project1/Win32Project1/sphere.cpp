@@ -45,5 +45,5 @@ void Sphere::FillHitInfos( HitInfos & hit_infos, const Ray & ray, float time ) c
     hit_infos.Time = time;
     hit_infos.Point = ray.PointAt( time );
     hit_infos.Normal = ( hit_infos.Point - center ) / radius;
-    hit_infos.Material = material;
+    hit_infos.Material = material.get();
 }
