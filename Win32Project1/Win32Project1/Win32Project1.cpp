@@ -239,7 +239,7 @@ static void RenderFrame()
     QueryPerformanceFrequency( &frequency );
 
     double s = double( dt ) / double( frequency.QuadPart );
-    sprintf_s( s_Buffer, sizeof( s_Buffer ), "%.2fms (%.1f FPS) %.2fMrays/s frame #%i \n", s * 1000.0f, 1.f / s, ray_count / s * 1.0e-6f, s_FrameCount );
+    sprintf_s(s_Buffer, sizeof(s_Buffer), "%.2fms (%.1f FPS) %.1fMrays/s %.2fMrays/frame frames %i\n", s * 1000.0f, 1.f / s, ray_count / s * 1.0e-6f, ray_count * 1.0e-6f, s_FrameCount);
     SetWindowTextA( g_Wnd, s_Buffer );
     OutputDebugStringA( s_Buffer );
 
