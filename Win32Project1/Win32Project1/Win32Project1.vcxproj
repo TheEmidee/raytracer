@@ -164,6 +164,7 @@
     <ClInclude Include="helpers.h" />
     <ClInclude Include="hitable.h" />
     <ClInclude Include="hitinfos.h" />
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="material.h" />
     <ClInclude Include="maths.h" />
     <ClInclude Include="ray.h" />
