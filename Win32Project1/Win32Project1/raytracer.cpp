@@ -60,7 +60,7 @@ struct RayTracerTaskSetData
 struct RayTracerTaskSet : enki::ITaskSet
 {
     RayTracerTaskSet( uint32_t setSize_, uint32_t minRange_, const RayTracerTaskSetData & data_ )
-        : enki::ITaskSet( setSize_, minRange_ ), taskSetdata( data_ )
+        : enki::ITaskSet( setSize_, minRange_ ), taskSetdata( data_ ), rayCount( 0 )
     {
     }
 
@@ -104,17 +104,21 @@ struct RayTracerTaskSet : enki::ITaskSet
         rayCount += ray_count;
     }
 
-    std::atomic< int > rayCount;
+    int rayCount;
 
 private:
 
     RayTracerTaskSetData taskSetdata;
 };
 
-void RayTracer::Process( Backbuffer & back_buffer, int & ray_count, const int frame_count, const World & world, const Camera & camera )
+RayTracer::RayTracer(int sample_per_pixel, int max_trace_depth)
+    : samplePerPixel(sample_per_pixel), maxTraceDepth(max_trace_depth)
 {
     taskScheduler.Initialize();
+}
 
+void RayTracer::Process( Backbuffer & back_buffer, int & ray_count, const int frame_count, const World & world, const Camera & camera )
+{
     RayTracerTaskSetData data
     {
         back_buffer.GetData(),

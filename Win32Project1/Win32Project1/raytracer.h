@@ -12,12 +12,9 @@ struct Ray;
 
 class RayTracer
 {
-
 public:
 
-    RayTracer( int sample_per_pixel, int max_trace_depth )
-        : samplePerPixel( sample_per_pixel ), maxTraceDepth( max_trace_depth )
-    {}
+    RayTracer(int sample_per_pixel, int max_trace_depth);
 
     void Process( Backbuffer & back_buffer, int & ray_count, const int frame_count, const World & world, const Camera & camera );
 
