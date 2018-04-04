@@ -84,6 +84,12 @@
     <ClInclude Include="enkiTS\Threads.h">
       <Filter>enki</Filter>
     </ClInclude>
+    <ClInclude Include="aabb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bvhnode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -118,6 +124,12 @@
     </ClCompile>
     <ClCompile Include="enkiTS\TaskScheduler_c.cpp">
       <Filter>enki</Filter>
+    </ClCompile>
+    <ClCompile Include="aabb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bvhnode.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

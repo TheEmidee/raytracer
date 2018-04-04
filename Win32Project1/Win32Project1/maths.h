@@ -14,3 +14,13 @@ Vec3 RandomInUnitSphere( uint32_t & state );
 Vec3 RandomUnitVector( uint32_t & state );
 
 float Schlick( float cosine, float refraction_index );
+
+inline float ffmin( float a, float b )
+{ 
+    return a < b ? a : b;
+}
+
+inline float ffmax(float a, float b)
+{
+    return a > b ? a : b;
+}

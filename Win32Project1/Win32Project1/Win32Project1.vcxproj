@@ -152,7 +152,9 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aabb.h" />
     <ClInclude Include="backbuffer.h" />
+    <ClInclude Include="bvhnode.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="enkiTS\Atomics.h" />
     <ClInclude Include="enkiTS\LockLessMultiReadPipe.h" />
@@ -175,7 +177,9 @@
     <ClInclude Include="world.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="aabb.cpp" />
     <ClCompile Include="backbuffer.cpp" />
+    <ClCompile Include="bvhnode.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="enkiTS\TaskScheduler.cpp" />
     <ClCompile Include="enkiTS\TaskScheduler_c.cpp" />

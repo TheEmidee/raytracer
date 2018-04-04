@@ -73,8 +73,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         std::make_shared< Sphere >( Vec3( -1.5f, 1.5f, 0.0f ), 0.3f, std::make_shared< MaterialLambert >( Vec3( 0.8f, 0.6f, 0.2f ) ) ),
     };
 
-    world = std::make_unique< World >( hitables );
-    rayTracer = std::make_unique< RayTracer >( 4, 10 );
+    uint32_t state = rand() * 9781 | 1;
+
+    world = std::make_unique< World >( hitables, state );
+    rayTracer = std::make_unique< RayTracer >( 50, 10 );
 
     const auto aspect_ratio = static_cast< float >( backBuffer->GetWidth() ) / static_cast< float >( backBuffer->GetHeight() );
 
@@ -83,8 +85,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         look_at( 0.0f, 0.0f, 0.0f );
     static const auto
         fov = 60.0f,
-        aperture = 0.1f,
-        focus_distance = 3.0f;
+        aperture = 0.0f,
+        focus_distance = 3.5f;
 
     camera = std::make_unique< Camera >( look_from, look_at, Vec3( 0.0f, 1.0f, 0.0f ), fov, aspect_ratio, aperture, focus_distance );
 
