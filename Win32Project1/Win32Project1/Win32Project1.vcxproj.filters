@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="enki">
+      <UniqueIdentifier>{b28681f3-9ec0-4cb0-a321-8155d723fa50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -66,6 +69,21 @@
     <ClInclude Include="material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="enkiTS\Atomics.h">
+      <Filter>enki</Filter>
+    </ClInclude>
+    <ClInclude Include="enkiTS\LockLessMultiReadPipe.h">
+      <Filter>enki</Filter>
+    </ClInclude>
+    <ClInclude Include="enkiTS\TaskScheduler.h">
+      <Filter>enki</Filter>
+    </ClInclude>
+    <ClInclude Include="enkiTS\TaskScheduler_c.h">
+      <Filter>enki</Filter>
+    </ClInclude>
+    <ClInclude Include="enkiTS\Threads.h">
+      <Filter>enki</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -94,6 +112,12 @@
     </ClCompile>
     <ClCompile Include="material.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="enkiTS\TaskScheduler.cpp">
+      <Filter>enki</Filter>
+    </ClCompile>
+    <ClCompile Include="enkiTS\TaskScheduler_c.cpp">
+      <Filter>enki</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

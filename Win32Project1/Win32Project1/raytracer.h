@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 
+#include "enkiTS/TaskScheduler.h"
 #include "vec3.h"
 
 class Backbuffer;
@@ -22,8 +23,7 @@ public:
 
 private:
 
-    Vec3 Trace( int & ray_count, const Ray & ray, const World & world, uint32_t & state, int depth ) const;
-
     int samplePerPixel;
     int maxTraceDepth;
+    enki::TaskScheduler taskScheduler;
 };

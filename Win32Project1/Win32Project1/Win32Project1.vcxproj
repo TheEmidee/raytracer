@@ -154,6 +154,11 @@
   <ItemGroup>
     <ClInclude Include="backbuffer.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="enkiTS\Atomics.h" />
+    <ClInclude Include="enkiTS\LockLessMultiReadPipe.h" />
+    <ClInclude Include="enkiTS\TaskScheduler.h" />
+    <ClInclude Include="enkiTS\TaskScheduler_c.h" />
+    <ClInclude Include="enkiTS\Threads.h" />
     <ClInclude Include="helpers.h" />
     <ClInclude Include="hitable.h" />
     <ClInclude Include="hitinfos.h" />
@@ -172,6 +177,8 @@
   <ItemGroup>
     <ClCompile Include="backbuffer.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="enkiTS\TaskScheduler.cpp" />
+    <ClCompile Include="enkiTS\TaskScheduler_c.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="maths.cpp" />
     <ClCompile Include="raytracer.cpp" />

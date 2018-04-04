@@ -60,8 +60,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
     backBuffer = std::make_unique< Backbuffer >( 1280, 720 );
 
-    const auto r = cosf( kPI / 4.0f );
-
     std::vector< std::shared_ptr< Hitable > > hitables = 
     {
         std::make_shared< Sphere >( Vec3( 0.0f, -100.5f, -1.0f ), 100.0f, std::make_shared< MaterialLambert >( Vec3( 0.8f, 0.8f, 0.8f ) ) ),

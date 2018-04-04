@@ -3,6 +3,7 @@
 #include "raytracer.h"
 
 #include <limits>
+#include <atomic>
 
 #include "backbuffer.h"
 #include "vec3.h"
@@ -13,44 +14,7 @@
 #include "maths.h"
 #include "material.h"
 
-void RayTracer::Process( Backbuffer & back_buffer, int & ray_count, const int frame_count, const World & world, const Camera & camera )
-{
-    float lerpFac = float( frame_count ) / float( frame_count + 1 );
-
-#pragma omp parallel for schedule( dynamic )
-    for ( int y = 0; y < back_buffer.GetHeight(); y++ )
-    {
-        float * data = back_buffer.GetData() + y * back_buffer.GetWidth() * 4;
-        uint32_t state = ( y * 9781 + frame_count * 6271 ) | 1;
-        
-        for ( int x = 0; x < back_buffer.GetWidth(); x++ )
-        {
-            Vec3 color( 0.0f, 0.0f, 0.0f );
-
-            for ( int sample = 0; sample < samplePerPixel; sample++ )
-            {
-                const auto u = static_cast< float >( x + RandomFloat01( state ) ) / static_cast< float >( back_buffer.GetWidth() );
-                const auto v = static_cast< float >( y + RandomFloat01( state ) ) / static_cast< float >( back_buffer.GetHeight() );
-
-                Ray ray = camera.GetRay( u, v, state );
-
-                color += Trace( ray_count, ray, world, state, 0 );
-            }
-            
-            color /= static_cast< float >( samplePerPixel );
-
-            Vec3 prev( data[ 0 ], data[ 1 ], data[ 2 ] );
-            color = prev * lerpFac + color * ( 1 - lerpFac );
-
-            data[ 0 ] = color.x;
-            data[ 1 ] = color.y;
-            data[ 2 ] = color.z;
-            data += 4;
-        }
-    }
-}
-
-Vec3 RayTracer::Trace( int & ray_count, const Ray & ray, const World & world, uint32_t & state, int depth ) const
+Vec3 Trace( int & ray_count, const Ray & ray, const World & world, uint32_t & state, int depth, int max_trace_depth )
 {
     HitInfos hit_infos;
 
@@ -61,17 +25,17 @@ Vec3 RayTracer::Trace( int & ray_count, const Ray & ray, const World & world, ui
         Ray scattered;
         Vec3 attenuation;
 
-        if ( depth < maxTraceDepth )
+        if ( depth < max_trace_depth )
         {
             if ( auto material_shared_ptr = hit_infos.Material.lock() )
             {
                 if ( material_shared_ptr->Scatter( ray, hit_infos, attenuation, scattered, state ) )
                 {
-                    return attenuation * Trace( ray_count, scattered, world, state, depth + 1 );
+                    return attenuation * Trace( ray_count, scattered, world, state, depth + 1, max_trace_depth );
                 }
             }
         }
-        
+
         return Vec3( 0.0f, 0.0f, 0.0f );
     }
 
@@ -79,4 +43,96 @@ Vec3 RayTracer::Trace( int & ray_count, const Ray & ray, const World & world, ui
     float t = 0.5f * ( direction.y + 1.0f );
 
     return ( 1.0f - t ) * Vec3::One() + t * Vec3( 0.5f, 0.7f, 1.0f );
+}
+
+struct RayTracerTaskSetData
+{
+    float * backBufferData;
+    int backBufferWidth;
+    int backBufferHeight;
+    int frameCount;
+    int samplePerPixel;
+    const Camera * camera;
+    const World * world;
+    int maxTraceDepth;
+};
+
+struct RayTracerTaskSet : enki::ITaskSet
+{
+    RayTracerTaskSet( uint32_t setSize_, uint32_t minRange_, const RayTracerTaskSetData & data_ )
+        : enki::ITaskSet( setSize_, minRange_ ), taskSetdata( data_ )
+    {
+    }
+
+    virtual void ExecuteRange( enki::TaskSetPartition range, uint32_t threadnum )
+    {
+        float lerpFac = float( taskSetdata.frameCount ) / float( taskSetdata.frameCount + 1 );
+
+        int ray_count = 0;
+        
+        for ( auto y = range.start; y < range.end; y++ )
+        {
+            float * data = taskSetdata.backBufferData + y * taskSetdata.backBufferWidth * 4;
+            uint32_t state = ( y * 9781 + taskSetdata.frameCount * 6271 ) | 1;
+
+            for ( int x = 0; x < taskSetdata.backBufferWidth; x++ )
+            {
+                Vec3 color( 0.0f, 0.0f, 0.0f );
+
+                for ( int sample = 0; sample < taskSetdata.samplePerPixel; sample++ )
+                {
+                    const auto u = static_cast< float >( x + RandomFloat01( state ) ) / static_cast< float >( taskSetdata.backBufferWidth );
+                    const auto v = static_cast< float >( y + RandomFloat01( state ) ) / static_cast< float >( taskSetdata.backBufferHeight );
+
+                    Ray ray = taskSetdata.camera->GetRay( u, v, state );
+
+                    color += Trace( ray_count, ray, *taskSetdata.world, state, 0, taskSetdata.maxTraceDepth );
+                }
+
+                color /= static_cast< float >( taskSetdata.samplePerPixel );
+
+                Vec3 prev( data[ 0 ], data[ 1 ], data[ 2 ] );
+                color = prev * lerpFac + color * ( 1 - lerpFac );
+
+                data[ 0 ] = color.x;
+                data[ 1 ] = color.y;
+                data[ 2 ] = color.z;
+                data += 4;
+            }
+        }
+
+        rayCount += ray_count;
+    }
+
+    std::atomic< int > rayCount;
+
+private:
+
+    RayTracerTaskSetData taskSetdata;
+};
+
+void RayTracer::Process( Backbuffer & back_buffer, int & ray_count, const int frame_count, const World & world, const Camera & camera )
+{
+    taskScheduler.Initialize();
+
+    RayTracerTaskSetData data
+    {
+        back_buffer.GetData(),
+        back_buffer.GetWidth(),
+        back_buffer.GetHeight(),
+        frame_count,
+        samplePerPixel,
+        &camera,
+        &world,
+        maxTraceDepth
+    };
+
+    RayTracerTaskSet task( static_cast< uint32_t >( back_buffer.GetHeight() ), 4, data );
+
+    taskScheduler.AddTaskSetToPipe( &task );
+
+    // wait for task set (running tasks if they exist) - since we've just added it and it has no range we'll likely run it.
+    taskScheduler.WaitforTaskSet( &task );
+
+    ray_count = task.rayCount;
 }
