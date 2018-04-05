@@ -3,6 +3,9 @@
 #include <math.h>
 #include <assert.h>
 
+#include "json.hpp"
+using nlohmann::json;
+
 struct Vec3
 {
     Vec3() : x( 0 ), y( 0 ), z( 0 ) {}
@@ -73,4 +76,11 @@ inline bool Refract( const Vec3 & vector, const Vec3 & normal, float ni_over_nt,
     }
 
     return false;
+}
+
+inline void from_json( const json & j, Vec3 & v )
+{
+    v.x = j[ 0 ];
+    v.y = j[ 1 ];
+    v.z = j[ 2 ];
 }

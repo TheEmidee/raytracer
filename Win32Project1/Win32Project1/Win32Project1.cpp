@@ -3,25 +3,18 @@
 #include <memory>
 #include <d3d11_1.h>
 #include <iostream>
-#include <fstream>
-#include <experimental/filesystem>
 #include "atlstr.h"
 #include "json.hpp"
 
 #include "Win32Project1.h"
 
-#include "backbuffer.h"
 #include "raytracer.h"
-#include "world.h"
 #include "maths.h"
-#include "sphere.h"
-#include "vec3.h"
-#include "camera.h"
+#include "fileloader.h"
+#include "resource_manager.h"
 
 #include "CompiledVertexShader.h"
 #include "CompiledPixelShader.h"
-
-namespace fs = std::experimental::filesystem;
 
 #define MAX_LOADSTRING 100
 
@@ -29,14 +22,14 @@ namespace fs = std::experimental::filesystem;
 HINSTANCE hInst;                                // current instance
 static HWND g_Wnd;
 
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
-WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+WCHAR szTitle[ MAX_LOADSTRING ];                  // The title bar text
+WCHAR szWindowClass[ MAX_LOADSTRING ];            // the main window class name
 
 // Forward declarations of functions included in this code module:
-ATOM                MyRegisterClass(HINSTANCE hInstance);
-BOOL                InitInstance(HINSTANCE, int);
-LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+ATOM                MyRegisterClass( HINSTANCE hInstance );
+BOOL                InitInstance( HINSTANCE, int );
+LRESULT CALLBACK    WndProc( HWND, UINT, WPARAM, LPARAM );
+INT_PTR CALLBACK    About( HWND, UINT, WPARAM, LPARAM );
 static char s_Buffer[ 200 ];
 
 static HRESULT InitD3DDevice();
@@ -55,77 +48,44 @@ static ID3D11ShaderResourceView* g_BackbufferSRV;
 static ID3D11SamplerState* g_SamplerLinear;
 static ID3D11RasterizerState* g_RasterState;
 
-std::unique_ptr< Backbuffer > backBuffer;
 std::unique_ptr< RayTracer > rayTracer;
-std::unique_ptr< World > world;
-std::unique_ptr< Camera > camera;
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow )
+int APIENTRY wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow )
 {
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
+    UNREFERENCED_PARAMETER( hPrevInstance );
+    UNREFERENCED_PARAMETER( lpCmdLine );
 
-    std::string file_name = CW2A(lpCmdLine);
-
-    if (file_name.empty())
-    {
-        return 0;
-    }
-
-    fs::path json_folder = fs::current_path().append("JSON");
-
-    if (!fs::exists(json_folder))
-    {
-        return 0;
-    }
-
-    fs::path path = json_folder / file_name;
-    path.replace_extension(".json");
-
-    if (!fs::exists(path))
-    {
-        return 0;
-    }
-
-    std::ifstream file_stream( path.string() );
-    nlohmann::json json;
-    file_stream >> json;
+    std::string file_name = CW2A( lpCmdLine );
 
     try
     {
-        auto backbuffer_json = json["backbuffer"];
-        auto width = backbuffer_json["width"];
-        auto height = backbuffer_json["height"];
-
-        backBuffer = std::make_unique< Backbuffer >(width, height);
+        FileLoader loader( rayTracer, file_name );
     }
-    catch ( const std::exception & exception )
+    catch ( const std::exception & e )
     {
-        std::cerr << exception.what();
         return 0;
     }
 
-    std::vector< std::shared_ptr< Hitable > > hitables = 
-    {
-        std::make_shared< Sphere >( Vec3( 0.0f, -100.5f, -1.0f ), 100.0f, std::make_shared< MaterialLambert >( Vec3( 0.8f, 0.8f, 0.8f ) ) ),
-        std::make_shared< Sphere >( Vec3( 2.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialLambert >( Vec3( 0.8f, 0.4f, 0.4f ) ) ),
-        std::make_shared< Sphere >( Vec3( 0.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialLambert >( Vec3( 0.4f, 0.8f, 0.4f ) ) ),
-        std::make_shared< Sphere >( Vec3( -2.0f, 0.0f, -1.0f ), 0.5f, std::make_shared< MaterialMetal >( Vec3( 0.4f, 0.4f, 0.8f ), 0.0f ) ),
-        std::make_shared< Sphere >( Vec3( 2.0f, 0.0f, 1.0f ), 0.5f, std::make_shared< MaterialMetal >( Vec3( 0.4f, 0.8f, 0.4f ), 0.0f ) ),
-        std::make_shared< Sphere >( Vec3( 0.0f, 0.0f, 1.0f ), 0.5f, std::make_shared< MaterialMetal >( Vec3( 0.4f, 0.8f, 0.4f ), 0.2f ) ),
-        std::make_shared< Sphere >( Vec3( -2.0f, 0.0f, 1.0f ), 0.5f, std::make_shared< MaterialMetal >( Vec3( 0.4f, 0.8f, 0.4f ), 0.6f ) ),
-        std::make_shared< Sphere >( Vec3( 0.5f, 1.0f, 0.5f ), 0.5f, std::make_shared< MaterialDiElectric >( 1.5f ) ),
-        std::make_shared< Sphere >( Vec3( -1.5f, 1.5f, 0.0f ), 0.3f, std::make_shared< MaterialLambert >( Vec3( 0.8f, 0.6f, 0.2f ) ) ),
-    };
+    //try
+    //{
+    //    auto backbuffer_json = json["backbuffer"];
+    //    auto width = backbuffer_json["width"];
+    //    auto height = backbuffer_json["height"];
 
-    uint32_t state = rand() * 9781 | 1;
+    //    //backBuffer = std::make_unique< Backbuffer >(width, height);
+    //}
+    //catch ( const std::exception & exception )
+    //{
+    //    std::cerr << exception.what();
+    //    return 0;
+    //}
 
-    world = std::make_unique< World >( hitables, state );
-    rayTracer = std::make_unique< RayTracer >( 50, 10 );
 
-    const auto aspect_ratio = static_cast< float >( backBuffer->GetWidth() ) / static_cast< float >( backBuffer->GetHeight() );
+    /*rayTracer = std::make_unique< RayTracer >( 1280, 720, 50, 10 );
 
-    static const Vec3 
+    const auto aspect_ratio = 1.777778f;
+
+    static const Vec3
         look_from( 0.0f, 2.0f, 3.0f ),
         look_at( 0.0f, 0.0f, 0.0f );
     static const auto
@@ -133,15 +93,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         aperture = 0.0f,
         focus_distance = 3.5f;
 
-    camera = std::make_unique< Camera >( look_from, look_at, Vec3( 0.0f, 1.0f, 0.0f ), fov, aspect_ratio, aperture, focus_distance );
+    camera = std::make_unique< Camera >( look_from, look_at, Vec3( 0.0f, 1.0f, 0.0f ), fov, aspect_ratio, aperture, focus_distance );*/
 
     // Initialize global strings
-    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_WIN32PROJECT1, szWindowClass, MAX_LOADSTRING);
-    MyRegisterClass(hInstance);
+    LoadStringW( hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING );
+    LoadStringW( hInstance, IDC_WIN32PROJECT1, szWindowClass, MAX_LOADSTRING );
+    MyRegisterClass( hInstance );
 
     // Perform application initialization:
-    if (!InitInstance (hInstance, nCmdShow))
+    if ( !InitInstance( hInstance, nCmdShow ) )
     {
         return FALSE;
     }
@@ -156,8 +116,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     g_D3D11Device->CreatePixelShader( g_PSBytecode, ARRAYSIZE( g_PSBytecode ), NULL, &g_PixelShader );
 
     D3D11_TEXTURE2D_DESC texDesc = {};
-    texDesc.Width = backBuffer->GetWidth();
-    texDesc.Height = backBuffer->GetHeight();
+    texDesc.Width = rayTracer->width;
+    texDesc.Height = rayTracer->height;
     texDesc.MipLevels = 1;
     texDesc.ArraySize = 1;
     texDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -202,81 +162,77 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
     ShutdownD3DDevice();
 
-    return (int) msg.wParam;
+    return ( int ) msg.wParam;
 }
 
-ATOM MyRegisterClass(HINSTANCE hInstance)
+ATOM MyRegisterClass( HINSTANCE hInstance )
 {
     WNDCLASSEXW wcex;
 
-    wcex.cbSize = sizeof(WNDCLASSEX);
+    wcex.cbSize = sizeof( WNDCLASSEX );
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WIN32PROJECT1));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_WIN32PROJECT1);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+    wcex.style = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc = WndProc;
+    wcex.cbClsExtra = 0;
+    wcex.cbWndExtra = 0;
+    wcex.hInstance = hInstance;
+    wcex.hIcon = LoadIcon( hInstance, MAKEINTRESOURCE( IDI_WIN32PROJECT1 ) );
+    wcex.hCursor = LoadCursor( nullptr, IDC_ARROW );
+    wcex.hbrBackground = ( HBRUSH ) ( COLOR_WINDOW + 1 );
+    wcex.lpszMenuName = MAKEINTRESOURCEW( IDC_WIN32PROJECT1 );
+    wcex.lpszClassName = szWindowClass;
+    wcex.hIconSm = LoadIcon( wcex.hInstance, MAKEINTRESOURCE( IDI_SMALL ) );
 
-    return RegisterClassExW(&wcex);
+    return RegisterClassExW( &wcex );
 }
 
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
+BOOL InitInstance( HINSTANCE hInstance, int nCmdShow )
 {
-   hInst = hInstance; // Store instance handle in our global variable
+    hInst = hInstance; // Store instance handle in our global variable
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+    HWND hWnd = CreateWindowW( szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr );
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
-
-   g_Wnd = hWnd;
-
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
-
-   return TRUE;
-}
-
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch (message)
+    if ( !hWnd )
     {
-    case WM_PAINT:
+        return FALSE;
+    }
+
+    g_Wnd = hWnd;
+
+    ShowWindow( hWnd, nCmdShow );
+    UpdateWindow( hWnd );
+
+    return TRUE;
+}
+
+LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
+{
+    switch ( message )
+    {
+        case WM_PAINT:
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint( hWnd, &ps );
             EndPaint( hWnd, &ps );
         }
         break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
+        case WM_DESTROY:
+            PostQuitMessage( 0 );
+            break;
+        default:
+            return DefWindowProc( hWnd, message, wParam, lParam );
     }
     return 0;
 }
 
 static void RenderFrame()
 {
-    static int s_FrameCount = 0;
-
     LARGE_INTEGER time1;
     QueryPerformanceCounter( &time1 );
 
     int ray_count = 0;
 
-    rayTracer->Process( *backBuffer.get(), ray_count, s_FrameCount, *world.get(), *camera.get() );
-
-    s_FrameCount++;
+    rayTracer->Process( ray_count );
 
     LARGE_INTEGER time2;
     QueryPerformanceCounter( &time2 );
@@ -286,20 +242,20 @@ static void RenderFrame()
     QueryPerformanceFrequency( &frequency );
 
     double s = double( dt ) / double( frequency.QuadPart );
-    sprintf_s(s_Buffer, sizeof(s_Buffer), "%.2fms (%.1f FPS) %.1fMrays/s %.2fMrays/frame frames %i\n", s * 1000.0f, 1.f / s, ray_count / s * 1.0e-6f, ray_count * 1.0e-6f, s_FrameCount);
+    sprintf_s( s_Buffer, sizeof( s_Buffer ), "%.2fms (%.1f FPS) %.1fMrays/s %.2fMrays/frame frames %i\n", s * 1000.0f, 1.f / s, ray_count / s * 1.0e-6f, ray_count * 1.0e-6f, rayTracer->frameIndex );
     SetWindowTextA( g_Wnd, s_Buffer );
     OutputDebugStringA( s_Buffer );
 
-    if ( auto * back_buffer = backBuffer.get() )
+    //if ( auto * back_buffer = backBuffer.get() )
     {
         D3D11_MAPPED_SUBRESOURCE mapped;
         g_D3D11Ctx->Map( g_BackbufferTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped );
-        const uint8_t* src = ( const uint8_t* ) back_buffer->GetData();
+        const uint8_t* src = ( const uint8_t* ) rayTracer->data;
         uint8_t* dst = ( uint8_t* ) mapped.pData;
-        for ( int y = 0; y < back_buffer->GetHeight(); ++y )
+        for ( int y = 0; y < rayTracer->height; ++y )
         {
-            memcpy( dst, src, back_buffer->GetWidth() * 16 );
-            src += back_buffer->GetWidth() * 16;
+            memcpy( dst, src, rayTracer->width * 16 );
+            src += rayTracer->width * 16;
             dst += mapped.RowPitch;
         }
         g_D3D11Ctx->Unmap( g_BackbufferTexture, 0 );
@@ -342,14 +298,14 @@ static HRESULT InitD3DDevice()
     IDXGIFactory1* dxgiFactory = nullptr;
     {
         IDXGIDevice* dxgiDevice = nullptr;
-        hr = g_D3D11Device->QueryInterface( __uuidof( IDXGIDevice ), reinterpret_cast<void**>( &dxgiDevice ) );
+        hr = g_D3D11Device->QueryInterface( __uuidof( IDXGIDevice ), reinterpret_cast< void** >( &dxgiDevice ) );
         if ( SUCCEEDED( hr ) )
         {
             IDXGIAdapter* adapter = nullptr;
             hr = dxgiDevice->GetAdapter( &adapter );
             if ( SUCCEEDED( hr ) )
             {
-                hr = adapter->GetParent( __uuidof( IDXGIFactory1 ), reinterpret_cast<void**>( &dxgiFactory ) );
+                hr = adapter->GetParent( __uuidof( IDXGIFactory1 ), reinterpret_cast< void** >( &dxgiFactory ) );
                 adapter->Release();
             }
             dxgiDevice->Release();
@@ -383,7 +339,7 @@ static HRESULT InitD3DDevice()
 
     // RTV
     ID3D11Texture2D* pBackBuffer = nullptr;
-    hr = g_D3D11SwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), reinterpret_cast<void**>( &pBackBuffer ) );
+    hr = g_D3D11SwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), reinterpret_cast< void** >( &pBackBuffer ) );
     if ( FAILED( hr ) )
         return hr;
     hr = g_D3D11Device->CreateRenderTargetView( pBackBuffer, nullptr, &g_D3D11RenderTarget );
@@ -409,7 +365,6 @@ static HRESULT InitD3DDevice()
 static void ShutdownD3DDevice()
 {
     if ( g_D3D11Ctx ) g_D3D11Ctx->ClearState();
-
     if ( g_D3D11RenderTarget ) g_D3D11RenderTarget->Release();
     if ( g_D3D11SwapChain ) g_D3D11SwapChain->Release();
     if ( g_D3D11Ctx ) g_D3D11Ctx->Release();

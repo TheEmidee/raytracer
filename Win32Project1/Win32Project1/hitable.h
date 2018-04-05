@@ -1,6 +1,10 @@
 #pragma once
 
 #include <memory>
+
+#include "json.hpp"
+using nlohmann::json;
+
 #include "vec3.h"
 #include "material.h"
 
@@ -14,9 +18,8 @@ public:
 
     Hitable() {}
 
-    Hitable( std::shared_ptr< const Material > material_ )
-        : material( material_ )
-    { }
+    Hitable( std::shared_ptr< const Material > material_ );
+    // Hitable( const json & material_json );
 
     virtual ~Hitable() = default;
     virtual bool Hit( const Ray & ray, float min_time, float max_time, HitInfos & hit_infos ) const = 0;

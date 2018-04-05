@@ -12,6 +12,9 @@ class Material
 {
 public:
 
+    Material() {}
+    ~Material() {}
+
     virtual bool Scatter( const Ray & ray, const HitInfos & hit_infos, Vec3 & attenuation, Ray & scattered_ray, uint32_t & state ) const = 0;
 };
 
@@ -19,9 +22,12 @@ class MaterialLambert : public Material
 {
 public:
 
+    MaterialLambert() {}
+
     MaterialLambert( const Vec3 & albedo )
         : Albedo( albedo )
-    { }
+    {
+    }
 
     virtual bool Scatter( const Ray & ray, const HitInfos & hit_infos, Vec3 & attenuation, Ray & scattered_ray, uint32_t & state ) const override;
 
@@ -33,6 +39,8 @@ private:
 class MaterialMetal : public Material
 {
 public:
+
+    MaterialMetal() {}
 
     MaterialMetal( const Vec3 & albedo, float fuzzyness )
         : Albedo( albedo )
@@ -51,6 +59,8 @@ private:
 class MaterialDiElectric : public Material
 {
 public:
+
+    MaterialDiElectric() {}
 
     MaterialDiElectric( float refraction_index )
         : RefractionIndex( refraction_index )

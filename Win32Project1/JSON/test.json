@@ -1,122 +1,133 @@
 {
-    "backbuffer": { 
-        "width" : 1280, 
-        "height" : 720 
+  "raytracer": {
+    "parameters": {
+      "width": 1280,
+      "height": 720,
+      "samplePerPixel": 50,
+      "maxTraceDepth": 10,
+      "frameCount": 10
     },
-    "raytracer" : { 
-        "samplePerPixel" : 50,
-        "maxTraceDepth" : 10 
+    "camera": {
+      "lookFrom": [ 0, 2, 3 ],
+      "lookAt": [ 0, 0, 0 ],
+      "up": [ 0, 1, 0 ],
+      "fov": 60,
+      "aspectRatio": 1.77778,
+      "aperture": 0,
+      "focusDistance": 3.5
     },
-    "camera" : { 
-        "lookFrom" : [ 0, 2, 3 ],
-        "lookAt" : [ 0, 0, 0 ],
-        "fov" : 60,
-        "aperture" : 0,
-        "focusDistance" : 3.5
-    },
-    "hitables" : [
-        {
-            "sphere" : {
-                "center" : [ 0.0, -100.5, -1.0 ],
-                "radius" : 100.0,
-                "material" : {
-                    "lambert" : {
-                        "albedo" : [ 0.8, 0.8, 0.8 ]
-                    }
-                }
+    "materials": [
+      {
+        "lambert1": {
+          "lambert": {
+            "albedo": [ 0.8, 0.4, 0.4 ]
+          }
+        }
+      },
+      {
+        "metal1": {
+          "metal": {
+            "albedo": [ 0.4, 0.4, 0.8 ],
+            "fuzzyness": 0
+          }
+        }
+      }
+    ],
+    "world": [
+      {
+        "sphere": {
+          "center": [ 0.0, -100.5, -1.0 ],
+          "radius": 100.0,
+          "material": {
+            "lambert": {
+              "albedo": [ 0.8, 0.8, 0.8 ]
             }
-        },
-        {
-            "sphere" : {
-                "center" : [ 2.0, 0.0, -1.0 ],
-                "radius" : 0.5,
-                "material" : {
-                    "lambert" : {
-                        "albedo" : [ 0.8, 0.4, 0.4 ]
-                    }
-                }
+          }
+        }
+      },
+      {
+        "sphere": {
+          "center": [ 2.0, 0.0, -1.0 ],
+          "radius": 0.5,
+          "material": "lambert1"
+        }
+      },
+      {
+        "sphere": {
+          "center": [ 0.0, 0.0, -1.0 ],
+          "radius": 0.5,
+          "material": {
+            "lambert": {
+              "albedo": [ 0.4, 0.8, 0.4 ]
             }
-        },
-        {
-            "sphere" : {
-                "center" : [ 0.0, 0.0, -1.0 ],
-                "radius" : 0.5,
-                "material" : {
-                    "lambert" : {
-                        "albedo" : [ 0.4, 0.8, 0.4 ]
-                    }
-                }
+          }
+        }
+      },
+      {
+        "sphere": {
+          "center": [ -2.0, 0.0, -1.0 ],
+          "radius": 0.5,
+          "material": "metal1"
+        }
+      },
+      {
+        "sphere": {
+          "center": [ 2.0, 0.0, 1.0 ],
+          "radius": 0.5,
+          "material": {
+            "metal": {
+              "albedo": [ 0.4, 0.8, 0.4 ],
+              "fuzzyness": 0
             }
-        },
-        {
-            "sphere" : {
-                "center" : [ -2.0, 0.0, -1.0 ],
-                "radius" : 0.5,
-                "material" : {
-                    "metal" : {
-                        "albedo" : [ 0.4, 0.4, 0.8 ],
-                        "fuzzyness" : 0
-                    }
-                }
+          }
+        }
+      },
+      {
+        "sphere": {
+          "center": [ 0.0, 0.0, 1.0 ],
+          "radius": 0.5,
+          "material": {
+            "metal": {
+              "albedo": [ 0.4, 0.8, 0.4 ],
+              "fuzzyness": 0.2
             }
-        },
-        {
-            "sphere" : {
-                "center" : [ 2.0, 0.0, 1.0 ],
-                "radius" : 0.5,
-                "material" : {
-                    "metal" : {
-                        "albedo" : [ 0.4, 0.8, 0.4 ],
-                        "fuzzyness" : 0
-                    }
-                }
+          }
+        }
+      },
+      {
+        "sphere": {
+          "center": [ -2.0, 0.0, 1.0 ],
+          "radius": 0.5,
+          "material": {
+            "metal": {
+              "albedo": [ 0.4, 0.8, 0.4 ],
+              "fuzzyness": 0.6
             }
-        },
-        {
-            "sphere" : {
-                "center" : [ 0.0, 0.0, 1.0 ],
-                "radius" : 0.5,
-                "material" : {
-                    "metal" : {
-                        "albedo" : [ 0.4, 0.8, 0.4 ],
-                        "fuzzyness" : 0.2
-                    }
-                }
+          }
+        }
+      },
+      {
+        "sphere": {
+          "center": [ 0.5, 1.0, 0.5 ],
+          "radius": 0.5,
+          "material": {
+            "dielectric": {
+              "refractionIndex": 1.5
             }
-        },
-        {
-            "sphere" : {
-                "center" : [ -2.0, 0.0, 1.0 ],
-                "radius" : 0.5,
-                "material" : {
-                    "metal" : {
-                        "albedo" : [ 0.4, 0.8, 0.4 ],
-                        "fuzzyness" : 0.6
-                    }
-                }
+          }
+        }
+      },
+      {
+        "sphere": {
+          "center": [ -1.5, -1.5, 0.0 ],
+          "radius": 0.3,
+          "material": {
+            "lambert": {
+              "albedo": [ 0.8, 0.6, 0.2 ]
             }
-        },
-        {
-            "sphere" : {
-                "center" : [ 0.5, 1.0, 0.5 ],
-                "radius" : 0.5,
-                "material" : {
-                    "DiElectric" : {
-                        "refractionIndex" : 1.5
-                    }
-                }
-            }
-        },
-        {
-            "sphere" : {
-                "center" : [ -1.5, -1.5, 0.0 ],
-                "radius" : 0.3,
-                "material" : {
-                    "lambert" : {
-                        "albedo" : [ 0.8, 0.6, 0.2 ]
-                    }
-                }
-            }
-        }       
+          }
+        }
+      }
     ]
+  }
 }

@@ -9,6 +9,12 @@ Sphere::Sphere( const Vec3 & center_, float radius_, std::shared_ptr< const Mate
 
 }
 
+//Sphere::Sphere( const json & sphere_json )
+//    : Hitable( material_ ), center( center_ ), radius( radius_ ), squaredRadius( radius_ * radius_ ), invRadius( 1.0f / radius_ )
+//{
+//
+//}
+
 bool Sphere::Hit( const Ray & ray, float min_time, float max_time, HitInfos & hit_infos ) const
 {
     Vec3 origin_to_center = ray.origin - center;

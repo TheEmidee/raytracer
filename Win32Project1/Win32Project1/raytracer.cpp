@@ -5,7 +5,6 @@
 #include <limits>
 #include <atomic>
 
-#include "backbuffer.h"
 #include "vec3.h"
 #include "ray.h"
 #include "world.h"
@@ -49,8 +48,8 @@ struct RayTracerTaskSetData
     int backBufferHeight;
     int frameCount;
     int samplePerPixel;
-    const Camera * camera;
-    const World * world;
+    const Camera & camera;
+    const World & world;
     int maxTraceDepth;
 };
 
@@ -66,7 +65,7 @@ struct RayTracerTaskSet : enki::ITaskSet
         float lerpFac = float( taskSetdata.frameCount ) / float( taskSetdata.frameCount + 1 );
 
         int ray_count = 0;
-        
+
         for ( auto y = range.start; y < range.end; y++ )
         {
             float * data = taskSetdata.backBufferData + y * taskSetdata.backBufferWidth * 4;
@@ -81,9 +80,9 @@ struct RayTracerTaskSet : enki::ITaskSet
                     const auto u = static_cast< float >( x + RandomFloat01( state ) ) / static_cast< float >( taskSetdata.backBufferWidth );
                     const auto v = static_cast< float >( y + RandomFloat01( state ) ) / static_cast< float >( taskSetdata.backBufferHeight );
 
-                    Ray ray = taskSetdata.camera->GetRay( u, v, state );
+                    Ray ray = taskSetdata.camera.GetRay( u, v, state );
 
-                    color += Trace( ray_count, ray, *taskSetdata.world, state, 0, taskSetdata.maxTraceDepth );
+                    color += Trace( ray_count, ray, taskSetdata.world, state, 0, taskSetdata.maxTraceDepth );
                 }
 
                 color /= static_cast< float >( taskSetdata.samplePerPixel );
@@ -108,27 +107,37 @@ private:
     RayTracerTaskSetData taskSetdata;
 };
 
-RayTracer::RayTracer(int sample_per_pixel, int max_trace_depth)
-    : samplePerPixel(sample_per_pixel), maxTraceDepth(max_trace_depth)
+RayTracer::RayTracer( const RayTracerParameters & parameters, std::unique_ptr<Camera> camera_, std::unique_ptr<World> world_ )
+    : width( parameters.width )
+    , height( parameters.height )
+    , samplePerPixel( parameters.samplePerPixel )
+    , maxTraceDepth( parameters.maxTraceDepth )
+    , frameCount( parameters.frameCount )
+    , frameIndex( 0 )
+    , camera( std::move( camera_ ) )
+    , world( std::move( world_ ) )
 {
     taskScheduler.Initialize();
+
+    data = new float[ width * height * 4 ];
+    memset( data, 0, width * height * 4 * sizeof( data[ 0 ] ) );
 }
 
-void RayTracer::Process( Backbuffer & back_buffer, int & ray_count, const int frame_count, const World & world, const Camera & camera )
+void RayTracer::Process( int & ray_count )
 {
-    RayTracerTaskSetData data
+    RayTracerTaskSetData task_set_data
     {
-        back_buffer.GetData(),
-        back_buffer.GetWidth(),
-        back_buffer.GetHeight(),
-        frame_count,
+        data,
+        width,
+        height,
+        frameIndex,
         samplePerPixel,
-        &camera,
-        &world,
+        *( camera.get() ),
+        *( world.get() ),
         maxTraceDepth
     };
 
-    RayTracerTaskSet task( static_cast< uint32_t >( back_buffer.GetHeight() ), 4, data );
+    RayTracerTaskSet task( static_cast< uint32_t >( height ), 4, task_set_data );
 
     taskScheduler.AddTaskSetToPipe( &task );
 
@@ -136,4 +145,14 @@ void RayTracer::Process( Backbuffer & back_buffer, int & ray_count, const int fr
     taskScheduler.WaitforTaskSet( &task );
 
     ray_count = task.rayCount;
+    frameIndex++;
+}
+
+void from_json( const json& j, RayTracerParameters & p )
+{
+    p.width = j.at( "width" ).get<int>();
+    p.height = j.at( "height" ).get<int>();
+    p.samplePerPixel = j.at( "samplePerPixel" ).get<int>();
+    p.maxTraceDepth = j.at( "maxTraceDepth" ).get<int>();
+    p.frameCount = j.at( "frameCount" ).get<int>();
 }
