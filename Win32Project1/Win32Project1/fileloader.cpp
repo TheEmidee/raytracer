@@ -44,6 +44,7 @@ FileLoader::FileLoader( std::unique_ptr<RayTracer> & ray_tracer, const std::stri
     CameraParameters camera_parameters = raytracer_json[ "camera" ];
     auto camera = std::make_unique< Camera >( camera_parameters );
 
+    TextureResourceManager::Instance().Load( raytracer_json[ "textures" ] );
     MaterialResourceManager::Instance().Load( raytracer_json[ "materials" ] );
 
     std::vector< std::shared_ptr< Hitable > > hitables;
@@ -87,7 +88,10 @@ bool FileLoader::CreateHitable( std::shared_ptr< Hitable > & hitable, const std:
 
         if ( material_json.is_object() )
         {
-            MaterialResourceManager::Instance().CreateMaterialFromJson( material, material_json );
+            if ( !MaterialResourceManager::Instance().CreateResourceFromJson( material, material_json ) )
+            {
+                return false;
+            }
         }
         else if ( !MaterialResourceManager::Instance().Get( material, material_json.get< std::string >() ) )
         {

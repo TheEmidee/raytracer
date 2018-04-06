@@ -2,12 +2,13 @@
 #include "hitinfos.h"
 #include "ray.h"
 #include "maths.h"
+#include "texture.h"
 
 bool MaterialLambert::Scatter( const Ray & ray, const HitInfos & hit_infos, Vec3 & attenuation, Ray & scattered_ray, uint32_t & state ) const
 {
     auto target = hit_infos.Point + hit_infos.Normal + RandomInUnitSphere( state );
     scattered_ray = Ray( hit_infos.Point, Normalize( target - hit_infos.Point ) );
-    attenuation = Albedo;
+    attenuation = texture->GetColor( 0.0f, 0.0f, hit_infos.Point );
 
     return true;
 }
@@ -15,8 +16,8 @@ bool MaterialLambert::Scatter( const Ray & ray, const HitInfos & hit_infos, Vec3
 bool MaterialMetal::Scatter( const Ray & ray, const HitInfos & hit_infos, Vec3 & attenuation, Ray & scattered_ray, uint32_t & state ) const
 {
     auto reflected = Reflect( ray.direction, hit_infos.Normal );
-    scattered_ray = Ray( hit_infos.Point, Normalize( reflected + Fuzzyness * RandomInUnitSphere( state ) ) );
-    attenuation = Albedo;
+    scattered_ray = Ray( hit_infos.Point, Normalize( reflected + roughness * RandomInUnitSphere( state ) ) );
+    attenuation = texture->GetColor( 0.0f, 0.0f, hit_infos.Point );
 
     return Vec3::Dot( scattered_ray.direction, hit_infos.Normal ) > 0.0f;
 }

@@ -16,19 +16,47 @@
       "aperture": 0,
       "focusDistance": 3.5
     },
-    "materials": [
+    "textures": [
       {
-        "lambert1": {
-          "lambert": {
-            "albedo": [ 0.8, 0.4, 0.4 ]
+        "textureConstantColorBlue": {
+          "constantcolor": {
+            "color": [ 0.4, 0.4, 0.8 ]
           }
         }
       },
       {
-        "metal1": {
+        "textureConstantColorGreen": {
+          "constantcolor": {
+            "color": [ 0.4, 0.8, 0.4 ]
+          }
+        }
+      },
+      {
+        "textureChecker1": {
+          "checker": {
+            "squareSize": 10,
+            "color": [ 0.4, 0.8, 0.4 ]
+          }
+        }
+      }
+    ],
+    "materials": [
+      {
+        "lambertConstantColorBlue": {
+          "lambert": {
+            "texture": "textureConstantColorBlue"
+          }
+        }
+      },
+      {
+        "metalConstantColorRed": {
           "metal": {
-            "albedo": [ 0.4, 0.4, 0.8 ],
-            "fuzzyness": 0
+            "texture": {
+              "constantcolor": {
+                "color": [ 0.8, 0.4, 0.4 ]
+              }
+            },
+            "roughness": 0
           }
         }
       }
@@ -40,7 +68,11 @@
           "radius": 100.0,
           "material": {
             "lambert": {
-              "albedo": [ 0.8, 0.8, 0.8 ]
+              "texture": {
+                "constantcolor": {
+                  "color": [ 0.8, 0.8, 0.8 ]
+                }
+              }
             }
           }
         }
@@ -49,7 +81,7 @@
         "sphere": {
           "center": [ 2.0, 0.0, -1.0 ],
           "radius": 0.5,
-          "material": "lambert1"
+          "material": "lambertConstantColorBlue"
         }
       },
       {
@@ -58,7 +90,11 @@
           "radius": 0.5,
           "material": {
             "lambert": {
-              "albedo": [ 0.4, 0.8, 0.4 ]
+              "texture": {
+                "constantcolor": {
+                  "color": [ 0.4, 0.8, 0.4 ]
+                }
+              }
             }
           }
         }
@@ -67,7 +103,7 @@
         "sphere": {
           "center": [ -2.0, 0.0, -1.0 ],
           "radius": 0.5,
-          "material": "metal1"
+          "material": "metalConstantColorRed"
         }
       },
       {
@@ -76,8 +112,8 @@
           "radius": 0.5,
           "material": {
             "metal": {
-              "albedo": [ 0.4, 0.8, 0.4 ],
-              "fuzzyness": 0
+              "texture": "textureConstantColorGreen",
+              "roughness": 0
             }
           }
         }
@@ -88,8 +124,8 @@
           "radius": 0.5,
           "material": {
             "metal": {
-              "albedo": [ 0.4, 0.8, 0.4 ],
-              "fuzzyness": 0.2
+              "texture": "textureConstantColorGreen",
+              "roughness": 0.2
             }
           }
         }
@@ -100,8 +136,8 @@
           "radius": 0.5,
           "material": {
             "metal": {
-              "albedo": [ 0.4, 0.8, 0.4 ],
-              "fuzzyness": 0.6
+              "texture": "textureConstantColorGreen",
+              "roughness": 0.6
             }
           }
         }
@@ -123,7 +159,11 @@
           "radius": 0.3,
           "material": {
             "lambert": {
-              "albedo": [ 0.8, 0.6, 0.2 ]
+              "texture": {
+                "constantcolor": {
+                  "color" : [ 0.8, 0.6, 0.2 ]
+                }
+              }
             }
           }
         }
