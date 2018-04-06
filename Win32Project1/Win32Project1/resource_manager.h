@@ -76,6 +76,16 @@ public:
 
                 return true;
             }
+            if ( texture_type == "checker" )
+            {
+                Vec3 color1 = ite.value()[ "color1" ];
+                Vec3 color2 = ite.value()[ "color2" ];
+                float size = ite.value()[ "squareSize" ];
+
+                texture_ptr = std::make_shared< TextureChecker >( color1, color2, size );
+
+                return true;
+            }
         }
 
         return false;

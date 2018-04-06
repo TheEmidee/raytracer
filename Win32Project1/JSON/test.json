@@ -35,7 +35,8 @@
         "textureChecker1": {
           "checker": {
             "squareSize": 10,
-            "color": [ 0.4, 0.8, 0.4 ]
+            "color1": [ 0.2, 0.2, 0.8 ],
+            "color2": [ 1.0, 1.0, 1.0 ]
           }
         }
       }
@@ -68,11 +69,7 @@
           "radius": 100.0,
           "material": {
             "lambert": {
-              "texture": {
-                "constantcolor": {
-                  "color": [ 0.8, 0.8, 0.8 ]
-                }
-              }
+              "texture": "textureChecker1"
             }
           }
         }
