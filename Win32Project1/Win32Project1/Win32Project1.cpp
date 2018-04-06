@@ -68,35 +68,6 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
         return 0;
     }
 
-    //try
-    //{
-    //    auto backbuffer_json = json["backbuffer"];
-    //    auto width = backbuffer_json["width"];
-    //    auto height = backbuffer_json["height"];
-
-    //    //backBuffer = std::make_unique< Backbuffer >(width, height);
-    //}
-    //catch ( const std::exception & exception )
-    //{
-    //    std::cerr << exception.what();
-    //    return 0;
-    //}
-
-
-    /*rayTracer = std::make_unique< RayTracer >( 1280, 720, 50, 10 );
-
-    const auto aspect_ratio = 1.777778f;
-
-    static const Vec3
-        look_from( 0.0f, 2.0f, 3.0f ),
-        look_at( 0.0f, 0.0f, 0.0f );
-    static const auto
-        fov = 60.0f,
-        aperture = 0.0f,
-        focus_distance = 3.5f;
-
-    camera = std::make_unique< Camera >( look_from, look_at, Vec3( 0.0f, 1.0f, 0.0f ), fov, aspect_ratio, aperture, focus_distance );*/
-
     // Initialize global strings
     LoadStringW( hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING );
     LoadStringW( hInstance, IDC_WIN32PROJECT1, szWindowClass, MAX_LOADSTRING );
@@ -156,7 +127,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
             TranslateMessage( &msg );
             DispatchMessage( &msg );
         }
-        else
+        else if ( !rayTracer->Finished() )
         {
             RenderFrame();
         }

@@ -11,3 +11,8 @@ Vec3 TextureChecker::GetColor( float u, float v, const Vec3 & position ) const
 
     return sine < 0.0f ? color1 : color2;
 }
+
+Vec3 TexturePerlinNoise::GetColor( float u, float v, const Vec3 & position ) const
+{
+    return Vec3( noise->GetNoise( position ) );
+}

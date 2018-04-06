@@ -167,6 +167,7 @@
     <ClInclude Include="json.hpp" />
     <ClInclude Include="material.h" />
     <ClInclude Include="maths.h" />
+    <ClInclude Include="perlinnoise.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="raytracer.h" />
     <ClInclude Include="Resource.h" />
@@ -189,6 +190,7 @@
     <ClCompile Include="hitable.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="maths.cpp" />
+    <ClCompile Include="perlinnoise.cpp" />
     <ClCompile Include="raytracer.cpp" />
     <ClCompile Include="sphere.cpp" />
     <ClCompile Include="stdafx.cpp">

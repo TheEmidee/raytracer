@@ -148,6 +148,11 @@ void RayTracer::Process( int & ray_count )
     frameIndex++;
 }
 
+bool RayTracer::Finished() const
+{
+    return frameIndex == frameCount;
+}
+
 void from_json( const json& j, RayTracerParameters & p )
 {
     p.width = j.at( "width" ).get<int>();

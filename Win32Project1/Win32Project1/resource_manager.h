@@ -86,6 +86,13 @@ public:
 
                 return true;
             }
+            if ( texture_type == "perlinnoise" )
+            {
+                float scale = ite.value()[ "scale" ];
+                texture_ptr = std::make_shared< TexturePerlinNoise >( scale );
+
+                return true;
+            }
         }
 
         return false;
@@ -107,21 +114,27 @@ public:
         for ( json::const_iterator ite = material_json.begin(); ite != material_json.end(); ++ite )
         {
             const auto material_type = ite.key();
-            
-            std::shared_ptr< Texture > texture_ptr;
-            if ( !TryGetTexture( texture_ptr, ite.value() ) )
-            {
-                return false;
-            }
 
             if ( material_type == "lambert" )
             {
+                std::shared_ptr< Texture > texture_ptr;
+                if ( !TryGetTexture( texture_ptr, ite.value() ) )
+                {
+                    return false;
+                }
+                
                 material_ptr = std::make_shared< MaterialLambert >( texture_ptr );
 
                 return true;
             }
             if ( material_type == "metal" )
             {
+                std::shared_ptr< Texture > texture_ptr;
+                if ( !TryGetTexture( texture_ptr, ite.value() ) )
+                {
+                    return false;
+                }
+                
                 float roughness = ite.value()[ "roughness" ];
                 material_ptr = std::make_shared< MaterialMetal >( texture_ptr, roughness );
 
@@ -157,7 +170,6 @@ private:
             return TextureResourceManager::Instance().Get( texture_ptr, texture_json.get< std::string >() );
         }
 
-        // return true to not fail the process. some materials dont need a texture
-        return true;
+        return false;
     }
 };

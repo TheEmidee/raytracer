@@ -27,18 +27,19 @@ class RayTracer
 {
 public:
 
-    RayTracer(const RayTracerParameters & parameters, std::unique_ptr<Camera> camera_, std::unique_ptr<World> world_);
+    RayTracer( const RayTracerParameters & parameters, std::unique_ptr<Camera> camera_, std::unique_ptr<World> world_ );
 
-    void Process(int & ray_count);
+    void Process( int & ray_count );
+    bool Finished() const;
 
+    float * data;
     int width;
     int height;
-    float * data;
     int frameIndex;
+    int frameCount;
 
 private:
 
-    int frameCount;
     int samplePerPixel;
     int maxTraceDepth;
     enki::TaskScheduler taskScheduler;

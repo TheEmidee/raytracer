@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vec3.h"
+#include "perlinnoise.h"
 
 class Texture
 {
@@ -36,4 +37,20 @@ public:
     Vec3 color1;
     Vec3 color2;
     float squareSize;
+};
+
+class TexturePerlinNoise : public Texture
+{
+public:
+
+    TexturePerlinNoise( float noise_scale )
+        : noise( std::make_unique< PerlinNoise >( noise_scale ) )
+    {
+    }
+
+    virtual Vec3 GetColor( float u, float v, const Vec3 & position ) const override;
+
+private:
+
+    std::unique_ptr< PerlinNoise > noise;
 };

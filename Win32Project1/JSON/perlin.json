@@ -1,0 +1,54 @@
+{
+  "raytracer": {
+    "parameters": {
+      "width": 1280,
+      "height": 720,
+      "samplePerPixel": 50,
+      "maxTraceDepth": 10,
+      "frameCount": 1
+    },
+    "camera": {
+      "lookFrom": [ 13, 2, 3 ],
+      "lookAt": [ 0, 0, 0 ],
+      "up": [ 0, 1, 0 ],
+      "fov": 20,
+      "aspectRatio": 1.77778,
+      "aperture": 0,
+      "focusDistance": 10
+    },
+    "textures": [
+      {
+        "perlinTexture": {
+          "perlinnoise": {
+            "scale" :  1.0
+          }
+        }
+      }
+    ],
+    "materials": [
+      {
+        "lambertPerlin": {
+          "lambert": {
+            "texture": "perlinTexture"
+          }
+        }
+      }
+    ],
+    "world": [
+      {
+        "sphere": {
+          "center": [ 0.0, -1000, 0.0 ],
+          "radius": 1000.0,
+          "material": "lambertPerlin"
+        }
+      },
+      {
+        "sphere": {
+          "center": [ 0.0, 2.0, 0.0 ],
+          "radius": 2,
+          "material": "lambertPerlin"
+        }
+      }
+    ]
+  }
+}

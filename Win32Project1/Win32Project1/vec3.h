@@ -9,6 +9,7 @@ using nlohmann::json;
 struct Vec3
 {
     Vec3() : x( 0 ), y( 0 ), z( 0 ) {}
+    Vec3( float value ) : x( value ), y( value ), z( value ) {}
     Vec3( float x_, float y_, float z_ ) : x( x_ ), y( y_ ), z( z_ ) {}
     
     float SquareLength() const { return x*x + y*y + z*z; }
