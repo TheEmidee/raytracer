@@ -43,8 +43,8 @@ class TexturePerlinNoise : public Texture
 {
 public:
 
-    TexturePerlinNoise( float noise_scale )
-        : noise( std::make_unique< PerlinNoise >( noise_scale ) )
+    TexturePerlinNoise( int resolution, float noise_scale )
+        : noise( std::make_unique< PerlinNoise >( resolution ) ), noiseScale( noise_scale )
     {
     }
 
@@ -53,4 +53,5 @@ public:
 private:
 
     std::unique_ptr< PerlinNoise > noise;
+    float noiseScale;
 };

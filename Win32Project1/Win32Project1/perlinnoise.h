@@ -1,25 +1,25 @@
 #pragma once
 
-#include <array> 
+#include <vector> 
 
-struct Vec3;
+#include "vec3.h"
 
 class PerlinNoise
 {
 public:
 
-    PerlinNoise( float scale_ );
+    PerlinNoise( int resolution_ );
 
     float GetNoise( const Vec3 & position ) const;
+    float GetTurbulence( const Vec3 & position, int depth = 7 ) const;
 
 private:
 
-    void GeneratePermutations( std::array< int, 256 > & permutations ) const;
-    void Permute( std::array< int, 256 > & permutations ) const;
+    void GeneratePermutations( std::vector< int > & permutations ) const;
+    void Permute( std::vector< int > & permutations ) const;
 
-    float scale;
-    std::array< float, 256 > data;
-    std::array< int, 256 > permX;
-    std::array< int, 256 > permY;
-    std::array< int, 256 > permZ;
+    std::vector< Vec3 > data;
+    std::vector< int > permX;
+    std::vector< int > permY;
+    std::vector< int > permZ;
 };

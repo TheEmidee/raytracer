@@ -137,7 +137,11 @@ void RayTracer::Process( int & ray_count )
         maxTraceDepth
     };
 
-    RayTracerTaskSet task( static_cast< uint32_t >( height ), 4, task_set_data );
+    const auto set_size = static_cast< uint32_t >( height );
+    const auto threaded = true;
+    const auto min_range = threaded ? 4 : set_size;
+
+    RayTracerTaskSet task( height, set_size, task_set_data );
 
     taskScheduler.AddTaskSetToPipe( &task );
 

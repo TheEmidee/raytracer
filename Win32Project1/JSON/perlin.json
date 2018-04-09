@@ -20,7 +20,8 @@
       {
         "perlinTexture": {
           "perlinnoise": {
-            "scale" :  1.0
+            "resolution": 256,
+            "scale": 4.0
           }
         }
       }

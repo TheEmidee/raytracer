@@ -88,8 +88,9 @@ public:
             }
             if ( texture_type == "perlinnoise" )
             {
+                int resolution = ite.value()[ "resolution" ];
                 float scale = ite.value()[ "scale" ];
-                texture_ptr = std::make_shared< TexturePerlinNoise >( scale );
+                texture_ptr = std::make_shared< TexturePerlinNoise >( resolution, scale );
 
                 return true;
             }
